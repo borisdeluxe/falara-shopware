@@ -55,7 +55,6 @@ Component.register('falara-translate-modal', {
                     <div :style="fieldGroupStyle">
                         <label :style="labelStyle">{{ $t('falara-translation-manager.modal.quality') }}</label>
                         <select v-model="form.quality" :style="selectStyle">
-                            <option value="draft">Draft</option>
                             <option value="standard">Standard</option>
                             <option value="premium">Premium</option>
                         </select>

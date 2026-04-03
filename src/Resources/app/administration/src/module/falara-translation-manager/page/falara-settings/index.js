@@ -235,7 +235,6 @@ Component.register('falara-settings', {
 
         qualityOptions() {
             return [
-                { value: 'draft', label: 'Draft' },
                 { value: 'standard', label: 'Standard' },
                 { value: 'premium', label: 'Premium' },
             ];
