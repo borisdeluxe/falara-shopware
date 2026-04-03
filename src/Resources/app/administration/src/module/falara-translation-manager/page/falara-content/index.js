@@ -47,7 +47,7 @@ Component.register('falara-content', {
                     <table v-if="items.length > 0" :style="tableStyle">
                         <thead>
                             <tr>
-                                <th :style="thStyle" :style="{ ...thStyle, width: '40px' }">
+                                <th :style="{ ...thStyle, width: '40px' }">
                                     <mt-checkbox
                                         :checked="allSelected"
                                         @change="toggleAll"
