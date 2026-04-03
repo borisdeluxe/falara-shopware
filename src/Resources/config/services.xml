@@ -4,7 +4,7 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="falara.api_url">https://falara.io</parameter>
+        <parameter key="falara.api_url">https://app.falara.io/api</parameter>
         <parameter key="falara.encryption_key">d97433877ff3d3b54ea242441fa1cb7fb59bbee343cae17bc66c153e89ee4226</parameter>
     </parameters>
 

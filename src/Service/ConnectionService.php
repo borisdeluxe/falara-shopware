@@ -141,7 +141,7 @@ class ConnectionService
 
     private function createApiClient(string $apiKey): FalaraApiClient
     {
-        $httpClient = new Client(['base_uri' => $this->falaraApiUrl]);
+        $httpClient = new Client(['base_uri' => rtrim($this->falaraApiUrl, '/') . '/']);
         return new FalaraApiClient($httpClient, $apiKey);
     }
 }

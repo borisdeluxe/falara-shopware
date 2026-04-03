@@ -13,15 +13,16 @@ class FalaraAccount
 
     public static function fromArray(array $data): self
     {
-        if (empty($data['id'])) {
-            throw new \InvalidArgumentException('FalaraAccount: $data[\'id\'] must not be empty.');
+        $id = $data['account_id'] ?? $data['id'] ?? null;
+        if (empty($id)) {
+            throw new \InvalidArgumentException('Falara API response missing required account_id field.');
         }
 
         return new self(
-            id: $data['id'],
-            name: $data['name'] ?? '',
-            plan: $data['plan'] ?? '',
-            role: $data['role'] ?? '',
+            id: $id,
+            name: $data['account_name'] ?? $data['name'] ?? '',
+            plan: $data['plan'] ?? 'unknown',
+            role: $data['role'] ?? 'unknown',
         );
     }
 }

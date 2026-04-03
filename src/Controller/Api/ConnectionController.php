@@ -8,6 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[Route(defaults: ['_routeScope' => ['api']])]
 class ConnectionController extends AbstractController
@@ -27,14 +28,16 @@ class ConnectionController extends AbstractController
 
         $apiKey         = $data['apiKey'] ?? '';
         $salesChannelId = $data['salesChannelId'] ?? '';
-        $webhookUrl     = $data['webhookUrl'] ?? '';
 
-        if ($apiKey === '' || $salesChannelId === '' || $webhookUrl === '') {
+        if ($apiKey === '' || $salesChannelId === '') {
             return new JsonResponse(
-                ['error' => 'apiKey, salesChannelId and webhookUrl are required.'],
+                ['error' => 'apiKey and salesChannelId are required.'],
                 400,
             );
         }
+
+        // Auto-generate webhook URL from current request
+        $webhookUrl = $request->getSchemeAndHttpHost() . '/api/_action/falara/webhook';
 
         try {
             $result = $this->connectionService->connect($apiKey, $salesChannelId, $webhookUrl, $context);

@@ -22,21 +22,21 @@ class FalaraApiClient
 
     public function getAccount(): FalaraAccount
     {
-        $data = $this->get('/v1/account');
+        $data = $this->get('v1/account');
 
         return FalaraAccount::fromArray($data);
     }
 
     public function getUsage(): FalaraUsage
     {
-        $data = $this->get('/v1/account/usage');
+        $data = $this->get('v1/account/usage');
 
         return FalaraUsage::fromArray($data);
     }
 
     public function getGlossaries(): array
     {
-        return $this->get('/v1/glossaries');
+        return $this->get('v1/glossaries');
     }
 
     public function createTranslationJob(
@@ -67,28 +67,28 @@ class FalaraApiClient
             'instructions'   => $options['instructions'] ?? null,
         ], static fn ($v) => $v !== null);
 
-        $data = $this->post('/v1/jobs', $body);
+        $data = $this->post('v1/jobs', $body);
 
         return FalaraBatchResponse::fromArray($data);
     }
 
     public function getJobStatus(string $jobId): FalaraJobStatus
     {
-        $data = $this->get('/v1/jobs/' . $jobId);
+        $data = $this->get('v1/jobs/' . $jobId);
 
         return FalaraJobStatus::fromArray($data);
     }
 
     public function getJobResult(string $jobId): FalaraJobResult
     {
-        $data = $this->get('/v1/jobs/' . $jobId . '/result');
+        $data = $this->get('v1/jobs/' . $jobId . '/result');
 
         return FalaraJobResult::fromArray($data);
     }
 
     public function registerWebhook(string $url, string $secret): void
     {
-        $this->put('/v1/webhooks/config', [
+        $this->put('v1/webhooks/config', [
             'url'    => $url,
             'secret' => $secret,
         ]);
@@ -97,7 +97,7 @@ class FalaraApiClient
     public function getWebhookConfig(): ?array
     {
         try {
-            return $this->get('/v1/webhooks/config');
+            return $this->get('v1/webhooks/config');
         } catch (FalaraApiException $e) {
             if ($e->getStatusCode() === 404) {
                 return null;
@@ -109,7 +109,7 @@ class FalaraApiClient
 
     public function deleteWebhook(): void
     {
-        $this->delete('/v1/webhooks/config');
+        $this->delete('v1/webhooks/config');
     }
 
     // -------------------------------------------------------------------------
