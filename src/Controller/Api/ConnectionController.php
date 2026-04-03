@@ -80,6 +80,16 @@ class ConnectionController extends AbstractController
             return new JsonResponse(['connection' => null]);
         }
 
+        // Enrich with account info from Falara API
+        try {
+            $apiClient = $this->connectionService->getApiClient($salesChannelId, $context);
+            $account = $apiClient->getAccount();
+            $connection['accountName'] = $account->name;
+            $connection['plan'] = $account->plan;
+        } catch (\Throwable $e) {
+            // Non-critical, continue without account name
+        }
+
         return new JsonResponse(['connection' => $connection]);
     }
 }

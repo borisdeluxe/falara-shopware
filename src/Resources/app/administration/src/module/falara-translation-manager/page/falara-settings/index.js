@@ -62,9 +62,17 @@ Component.register('falara-settings', {
                         </div>
 
                         <div :style="metaBlockStyle">
+                            <div v-if="connectionData.accountName" :style="metaLineStyle">
+                                <span :style="metaKeyStyle">Name:</span>
+                                <span :style="metaValStyle">{{ connectionData.accountName }}</span>
+                            </div>
                             <div v-if="connectionData.accountId" :style="metaLineStyle">
                                 <span :style="metaKeyStyle">Account ID:</span>
                                 <span :style="metaValStyle">{{ connectionData.accountId }}</span>
+                            </div>
+                            <div v-if="connectionData.plan" :style="metaLineStyle">
+                                <span :style="metaKeyStyle">Plan:</span>
+                                <span :style="metaValStyle">{{ connectionData.plan }}</span>
                             </div>
                             <div v-if="connectionData.connectedAt" :style="metaLineStyle">
                                 <span :style="metaKeyStyle">Connected since:</span>
@@ -496,6 +504,8 @@ Component.register('falara-settings', {
                 if (this.isConnected) {
                     this.connectionData = {
                         accountId: conn.falaraAccountId,
+                        accountName: conn.accountName || null,
+                        plan: conn.plan || null,
                         connectedAt: conn.connectedAt || null,
                     };
                 } else {
