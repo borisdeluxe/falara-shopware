@@ -2,57 +2,73 @@ const { Component } = Shopware;
 
 Component.register('falara-translate-modal', {
     template: `
-        <div class="falara-translate-modal">
-            <div class="falara-translate-modal__summary">
-                <p>{{ $t('falara-translation-manager.modal.itemCount', { count: items.length }) }}</p>
+        <div :style="containerStyle">
+            <div :style="summaryStyle">
+                <span>{{ items.length }} {{ items.length === 1 ? 'item' : 'items' }} selected</span>
             </div>
 
-            <div class="falara-translate-modal__languages">
-                <h3>{{ $t('falara-translation-manager.modal.targetLanguages') }}</h3>
-                <div v-for="lang in availableLanguages" :key="lang.id" class="falara-translate-modal__lang-option">
-                    <mt-checkbox
-                        :label="lang.name"
-                        :checked="selectedLanguages.includes(lang.id)"
-                        @change="toggleLanguage(lang.id)"
-                    />
+            <div :style="sectionStyle">
+                <label :style="labelStyle">{{ $t('falara-translation-manager.modal.targetLanguages') }}</label>
+                <div :style="langGridStyle">
+                    <div
+                        v-for="lang in availableLanguages"
+                        :key="lang.id"
+                        :style="langItemStyle"
+                    >
+                        <input
+                            type="checkbox"
+                            :id="'lang-' + lang.id"
+                            :value="lang.id"
+                            v-model="selectedLanguages"
+                            :style="checkboxStyle"
+                        />
+                        <label :for="'lang-' + lang.id" :style="checkboxLabelStyle">{{ lang.name }}</label>
+                    </div>
                 </div>
             </div>
 
-            <div class="falara-translate-modal__glossary">
-                <mt-select
-                    :label="$t('falara-translation-manager.modal.glossary')"
-                    v-model="selectedGlossary"
-                    :options="glossaryOptions"
-                />
+            <div :style="sectionStyle">
+                <label :style="labelStyle">{{ $t('falara-translation-manager.modal.glossary') }}</label>
+                <select v-model="selectedGlossary" :style="selectStyle">
+                    <option :value="null">{{ $t('falara-translation-manager.modal.noGlossary') }}</option>
+                    <option v-for="g in glossaries" :key="g.id" :value="g.id">{{ g.name }}</option>
+                </select>
             </div>
 
-            <div class="falara-translate-modal__advanced">
-                <button class="falara-translate-modal__toggle" @click="showAdvanced = !showAdvanced">
+            <div :style="sectionStyle">
+                <button :style="toggleStyle" @click="showAdvanced = !showAdvanced">
                     {{ $t('falara-translation-manager.modal.advancedOptions') }}
-                    <span>{{ showAdvanced ? '▲' : '▼' }}</span>
+                    <span>{{ showAdvanced ? ' ▲' : ' ▼' }}</span>
                 </button>
-                <div v-if="showAdvanced" class="falara-translate-modal__advanced-content">
-                    <mt-text-field
-                        :label="$t('falara-translation-manager.modal.domain')"
-                        v-model="form.domain"
-                    />
-                    <mt-text-field
-                        :label="$t('falara-translation-manager.modal.tone')"
-                        v-model="form.tone"
-                    />
-                    <mt-select
-                        :label="$t('falara-translation-manager.modal.quality')"
-                        v-model="form.quality"
-                        :options="qualityOptions"
-                    />
-                    <mt-textarea
-                        :label="$t('falara-translation-manager.modal.instructions')"
-                        v-model="form.instructions"
-                    />
+
+                <div v-if="showAdvanced" :style="advancedContentStyle">
+                    <div :style="fieldGroupStyle">
+                        <label :style="labelStyle">{{ $t('falara-translation-manager.modal.domain') }}</label>
+                        <mt-text-field v-model="form.domain" />
+                    </div>
+
+                    <div :style="fieldGroupStyle">
+                        <label :style="labelStyle">{{ $t('falara-translation-manager.modal.tone') }}</label>
+                        <mt-text-field v-model="form.tone" />
+                    </div>
+
+                    <div :style="fieldGroupStyle">
+                        <label :style="labelStyle">{{ $t('falara-translation-manager.modal.quality') }}</label>
+                        <select v-model="form.quality" :style="selectStyle">
+                            <option value="draft">Draft</option>
+                            <option value="standard">Standard</option>
+                            <option value="premium">Premium</option>
+                        </select>
+                    </div>
+
+                    <div :style="fieldGroupStyle">
+                        <label :style="labelStyle">{{ $t('falara-translation-manager.modal.instructions') }}</label>
+                        <mt-textarea v-model="form.instructions" />
+                    </div>
                 </div>
             </div>
 
-            <div class="falara-translate-modal__actions">
+            <div :style="actionsStyle">
                 <mt-button variant="ghost" @click="$emit('cancel')">
                     {{ $t('falara-translation-manager.modal.cancel') }}
                 </mt-button>
@@ -102,19 +118,120 @@ Component.register('falara-translate-modal', {
     },
 
     computed: {
-        glossaryOptions() {
-            const none = [{ value: null, label: this.$t('falara-translation-manager.modal.noGlossary') }];
-            return none.concat(
-                this.glossaries.map(g => ({ value: g.id, label: g.name }))
-            );
+        containerStyle() {
+            return {
+                background: '#ffffff',
+                borderRadius: '10px',
+                padding: '24px',
+                boxShadow: '0 4px 24px rgba(0,0,0,0.10)',
+                fontFamily: 'inherit',
+            };
         },
-
-        qualityOptions() {
-            return [
-                { value: 'draft', label: 'Draft' },
-                { value: 'standard', label: 'Standard' },
-                { value: 'premium', label: 'Premium' },
-            ];
+        summaryStyle() {
+            return {
+                display: 'inline-block',
+                background: '#f3f4f6',
+                borderRadius: '999px',
+                padding: '4px 16px',
+                fontSize: '13px',
+                color: '#6b7280',
+                marginBottom: '20px',
+                fontWeight: '500',
+            };
+        },
+        sectionStyle() {
+            return {
+                marginBottom: '20px',
+            };
+        },
+        langGridStyle() {
+            return {
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: '8px',
+                marginTop: '8px',
+            };
+        },
+        langItemStyle() {
+            return {
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+            };
+        },
+        checkboxStyle() {
+            return {
+                cursor: 'pointer',
+                width: '15px',
+                height: '15px',
+                flexShrink: '0',
+            };
+        },
+        checkboxLabelStyle() {
+            return {
+                fontSize: '13px',
+                color: '#374151',
+                cursor: 'pointer',
+            };
+        },
+        selectStyle() {
+            return {
+                width: '100%',
+                padding: '8px 12px',
+                border: '1px solid #d1d5db',
+                borderRadius: '6px',
+                fontSize: '14px',
+                background: '#fff',
+                color: '#111827',
+                outline: 'none',
+                cursor: 'pointer',
+                height: '40px',
+            };
+        },
+        labelStyle() {
+            return {
+                display: 'block',
+                fontSize: '13px',
+                fontWeight: '600',
+                color: '#374151',
+                marginBottom: '4px',
+            };
+        },
+        toggleStyle() {
+            return {
+                background: 'none',
+                border: 'none',
+                padding: '0',
+                fontSize: '13px',
+                fontWeight: '600',
+                color: '#6366f1',
+                cursor: 'pointer',
+                textDecoration: 'underline',
+            };
+        },
+        advancedContentStyle() {
+            return {
+                marginTop: '16px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+            };
+        },
+        fieldGroupStyle() {
+            return {
+                display: 'flex',
+                flexDirection: 'column',
+            };
+        },
+        actionsStyle() {
+            return {
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: '12px',
+                borderTop: '1px solid #e5e7eb',
+                paddingTop: '20px',
+                marginTop: '4px',
+            };
         },
     },
 
@@ -142,13 +259,12 @@ Component.register('falara-translate-modal', {
 
         loadLanguages() {
             const languageRepository = Shopware.Service('repositoryFactory').create('language');
-            languageRepository.search(
-                Shopware.Data.Criteria.fromCriteria({ associations: ['locale'] }),
-                Shopware.Context.api
-            ).then(result => {
+            const criteria = new Shopware.Data.Criteria();
+            criteria.addAssociation('locale');
+            languageRepository.search(criteria, Shopware.Context.api).then(result => {
                 this.availableLanguages = result.map(lang => ({
                     id: lang.id,
-                    name: lang.name,
+                    name: lang.name || lang.locale?.name || lang.id,
                 }));
             }).catch(() => {
                 this.availableLanguages = [];
@@ -158,7 +274,8 @@ Component.register('falara-translate-modal', {
         loadGlossaries() {
             const falaraApiService = Shopware.Service('falaraApiService');
             falaraApiService.getGlossaries(this.salesChannelId).then(response => {
-                this.glossaries = response.data || [];
+                const data = response.data;
+                this.glossaries = Array.isArray(data) ? data : (data?.glossaries || data?.items || []);
             }).catch(() => {
                 this.glossaries = [];
             });
