@@ -2,140 +2,190 @@ const { Component } = Shopware;
 
 Component.register('falara-settings', {
     template: `
-        <div class="falara-settings">
+        <div>
             <falara-nav-tabs />
-            <mt-card :title="$t('falara-translation-manager.settings.title')">
-                <mt-tabs
-                    :items="tabItems"
-                    v-model="activeTab"
-                    @change="onTabChange"
-                />
 
-                <mt-loader v-if="isLoading" />
+            <mt-loader v-if="isLoading" />
 
-                <div v-else>
-                    <!-- Connection Tab -->
-                    <div v-show="activeTab === 'connection'" class="falara-settings__tab-content">
-                        <h3>{{ $t('falara-translation-manager.settings.connection.title') }}</h3>
+            <div v-else>
+                <!-- Sub-tab bar -->
+                <div :style="subTabBarStyle">
+                    <button
+                        v-for="tab in subTabs"
+                        :key="tab.key"
+                        :style="activeTab === tab.key ? activeSubTabStyle : subTabStyle"
+                        @click="activeTab = tab.key"
+                        @mouseenter="onSubTabHover($event, tab.key)"
+                        @mouseleave="onSubTabLeave($event, tab.key)"
+                    >
+                        {{ tab.label }}
+                    </button>
+                </div>
 
-                        <div class="falara-settings__status">
-                            <span class="falara-settings__status-label">{{ $t('falara-translation-manager.settings.connection.status') }}:</span>
-                            <span v-if="isConnected" class="falara-settings__status--connected">
-                                {{ $t('falara-translation-manager.settings.connection.connected') }}
-                                <span v-if="connectionData.account"> — {{ $t('falara-translation-manager.settings.connection.connectedAs', { account: connectionData.account }) }}</span>
-                            </span>
-                            <span v-else class="falara-settings__status--disconnected">
-                                {{ $t('falara-translation-manager.settings.connection.notConnected') }}
-                            </span>
-                        </div>
+                <!-- CONNECTION TAB -->
+                <div v-show="activeTab === 'connection'">
 
-                        <div v-if="!isConnected" class="falara-settings__connect-form">
+                    <!-- NOT connected -->
+                    <div v-if="!isConnected" :style="cardStyle">
+                        <h2 :style="cardTitleStyle">Connect to Falara</h2>
+
+                        <div :style="fieldWrapStyle">
                             <mt-text-field
-                                :label="$t('falara-translation-manager.settings.connection.apiKey')"
-                                :placeholder="$t('falara-translation-manager.settings.connection.apiKeyPlaceholder')"
+                                label="API Key"
+                                placeholder="Enter your Falara API key"
                                 v-model="connectForm.apiKey"
                                 type="password"
                             />
+                        </div>
+
+                        <div :style="fieldWrapStyle">
                             <mt-button
                                 variant="primary"
                                 :disabled="!connectForm.apiKey || isConnecting"
                                 @click="connect"
                             >
-                                {{ isConnecting ? $t('falara-translation-manager.general.loading') : $t('falara-translation-manager.settings.connection.connect') }}
+                                {{ isConnecting ? 'Connecting…' : 'Connect' }}
                             </mt-button>
                         </div>
 
-                        <div v-else class="falara-settings__disconnect">
-                            <mt-button
-                                variant="danger"
-                                :disabled="isDisconnecting"
-                                @click="confirmDisconnect"
-                            >
-                                {{ isDisconnecting ? $t('falara-translation-manager.general.loading') : $t('falara-translation-manager.settings.connection.disconnect') }}
-                            </mt-button>
-                        </div>
-
-                        <div v-if="showDisconnectConfirm" class="falara-settings__confirm-dialog">
-                            <p>{{ $t('falara-translation-manager.settings.connection.disconnectConfirm') }}</p>
-                            <mt-button variant="danger" @click="disconnect">{{ $t('falara-translation-manager.general.yes') }}</mt-button>
-                            <mt-button variant="ghost" @click="showDisconnectConfirm = false">{{ $t('falara-translation-manager.general.no') }}</mt-button>
-                        </div>
+                        <p :style="linkTextStyle">
+                            Don't have an account?
+                            <a href="https://app.falara.io" target="_blank" :style="linkAStyle">Visit app.falara.io</a>
+                        </p>
                     </div>
 
-                    <!-- Custom Fields Tab -->
-                    <div v-show="activeTab === 'customFields'" class="falara-settings__tab-content">
-                        <h3>{{ $t('falara-translation-manager.settings.customFields.title') }}</h3>
-                        <p>{{ $t('falara-translation-manager.settings.customFields.description') }}</p>
+                    <!-- CONNECTED -->
+                    <div v-else :style="cardStyle">
+                        <div :style="statusRowStyle">
+                            <span :style="statusDotStyle"></span>
+                            <span :style="connectedLabelStyle">Connected</span>
+                        </div>
 
-                        <div class="falara-settings__custom-fields-form">
-                            <mt-text-field
-                                :label="$t('falara-translation-manager.settings.customFields.fieldName')"
-                                v-model="newFieldName"
-                            />
-                            <mt-button variant="primary" @click="addCustomField" :disabled="!newFieldName">
-                                {{ $t('falara-translation-manager.settings.customFields.addField') }}
+                        <div :style="metaBlockStyle">
+                            <div v-if="connectionData.accountId" :style="metaLineStyle">
+                                <span :style="metaKeyStyle">Account ID:</span>
+                                <span :style="metaValStyle">{{ connectionData.accountId }}</span>
+                            </div>
+                            <div v-if="connectionData.connectedAt" :style="metaLineStyle">
+                                <span :style="metaKeyStyle">Connected since:</span>
+                                <span :style="metaValStyle">{{ formatDate(connectionData.connectedAt) }}</span>
+                            </div>
+                        </div>
+
+                        <div v-if="!showDisconnectConfirm" :style="{ marginTop: '16px' }">
+                            <mt-button
+                                variant="danger"
+                                size="small"
+                                :disabled="isDisconnecting"
+                                @click="showDisconnectConfirm = true"
+                            >
+                                {{ isDisconnecting ? 'Disconnecting…' : 'Disconnect' }}
                             </mt-button>
                         </div>
 
-                        <div v-if="customFields.length === 0" class="falara-settings__empty">
-                            <p>{{ $t('falara-translation-manager.settings.customFields.noFields') }}</p>
+                        <div v-else :style="confirmBoxStyle">
+                            <p :style="confirmTextStyle">Are you sure? This will cancel all pending jobs.</p>
+                            <div :style="confirmBtnRowStyle">
+                                <mt-button variant="danger" size="small" @click="disconnect">Yes</mt-button>
+                                <mt-button variant="ghost" size="small" @click="showDisconnectConfirm = false">No</mt-button>
+                            </div>
                         </div>
-                        <ul v-else class="falara-settings__custom-fields-list">
-                            <li v-for="(field, idx) in customFields" :key="idx" class="falara-settings__custom-field-item">
+                    </div>
+                </div>
+
+                <!-- CUSTOM FIELDS TAB -->
+                <div v-show="activeTab === 'customFields'">
+                    <div :style="cardStyle">
+                        <h2 :style="cardTitleStyle">Custom Fields</h2>
+                        <p :style="descStyle">Define additional custom fields to include in translations.</p>
+
+                        <div :style="fieldWrapStyle">
+                            <mt-text-field
+                                label="Field Name"
+                                v-model="newFieldName"
+                            />
+                        </div>
+                        <div :style="{ marginBottom: '20px' }">
+                            <mt-button variant="primary" @click="addCustomField" :disabled="!newFieldName">
+                                Add Field
+                            </mt-button>
+                        </div>
+
+                        <p v-if="customFields.length === 0" :style="emptyTextStyle">No custom fields added yet.</p>
+                        <ul v-else :style="fieldListStyle">
+                            <li
+                                v-for="(field, idx) in customFields"
+                                :key="idx"
+                                :style="fieldItemStyle"
+                            >
                                 <span>{{ field }}</span>
                                 <mt-button variant="ghost" size="small" @click="removeCustomField(idx)">
-                                    {{ $t('falara-translation-manager.settings.customFields.removeField') }}
+                                    Remove
                                 </mt-button>
                             </li>
                         </ul>
 
                         <mt-button variant="primary" @click="saveCustomFields" :disabled="isSaving">
-                            {{ isSaving ? $t('falara-translation-manager.general.loading') : $t('falara-translation-manager.general.save') }}
-                        </mt-button>
-                    </div>
-
-                    <!-- Defaults Tab -->
-                    <div v-show="activeTab === 'defaults'" class="falara-settings__tab-content">
-                        <h3>{{ $t('falara-translation-manager.settings.defaults.title') }}</h3>
-
-                        <mt-text-field
-                            :label="$t('falara-translation-manager.settings.defaults.sourceLanguage')"
-                            v-model="defaults.sourceLanguage"
-                        />
-
-                        <mt-text-field
-                            :label="$t('falara-translation-manager.settings.defaults.domain')"
-                            v-model="defaults.domain"
-                        />
-
-                        <mt-text-field
-                            :label="$t('falara-translation-manager.settings.defaults.tone')"
-                            v-model="defaults.tone"
-                        />
-
-                        <mt-select
-                            :label="$t('falara-translation-manager.settings.defaults.quality')"
-                            v-model="defaults.quality"
-                            :options="qualityOptions"
-                        />
-
-                        <mt-select
-                            :label="$t('falara-translation-manager.settings.defaults.provider')"
-                            v-model="defaults.provider"
-                            :options="providerOptions"
-                        />
-
-                        <mt-textarea
-                            :label="$t('falara-translation-manager.settings.defaults.instructions')"
-                            v-model="defaults.instructions"
-                        />
-
-                        <mt-button variant="primary" @click="saveDefaults" :disabled="isSaving">
-                            {{ isSaving ? $t('falara-translation-manager.general.loading') : $t('falara-translation-manager.settings.defaults.save') }}
+                            {{ isSaving ? 'Saving…' : 'Save' }}
                         </mt-button>
                     </div>
                 </div>
-            </mt-card>
+
+                <!-- DEFAULTS TAB -->
+                <div v-show="activeTab === 'defaults'">
+                    <div :style="cardStyle">
+                        <h2 :style="cardTitleStyle">Translation Defaults</h2>
+
+                        <div :style="fieldWrapStyle">
+                            <mt-text-field
+                                label="Source Language"
+                                v-model="defaults.sourceLanguage"
+                            />
+                        </div>
+
+                        <div :style="fieldWrapStyle">
+                            <mt-text-field
+                                label="Domain"
+                                v-model="defaults.domain"
+                            />
+                        </div>
+
+                        <div :style="fieldWrapStyle">
+                            <mt-text-field
+                                label="Tone"
+                                v-model="defaults.tone"
+                            />
+                        </div>
+
+                        <div :style="fieldWrapStyle">
+                            <mt-select
+                                label="Quality"
+                                v-model="defaults.quality"
+                                :options="qualityOptions"
+                            />
+                        </div>
+
+                        <div :style="fieldWrapStyle">
+                            <mt-select
+                                label="Provider"
+                                v-model="defaults.provider"
+                                :options="providerOptions"
+                            />
+                        </div>
+
+                        <div :style="fieldWrapStyle">
+                            <mt-textarea
+                                label="Instructions"
+                                v-model="defaults.instructions"
+                            />
+                        </div>
+
+                        <mt-button variant="primary" @click="saveDefaults" :disabled="isSaving">
+                            {{ isSaving ? 'Saving…' : 'Save Defaults' }}
+                        </mt-button>
+                    </div>
+                </div>
+            </div>
         </div>
     `,
 
@@ -167,11 +217,11 @@ Component.register('falara-settings', {
     },
 
     computed: {
-        tabItems() {
+        subTabs() {
             return [
-                { name: 'connection', label: this.$t('falara-translation-manager.settings.tabs.connection') },
-                { name: 'customFields', label: this.$t('falara-translation-manager.settings.tabs.customFields') },
-                { name: 'defaults', label: this.$t('falara-translation-manager.settings.tabs.defaults') },
+                { key: 'connection', label: 'Connection' },
+                { key: 'customFields', label: 'Custom Fields' },
+                { key: 'defaults', label: 'Defaults' },
             ];
         },
 
@@ -191,6 +241,204 @@ Component.register('falara-settings', {
                 { value: 'chatgpt', label: 'ChatGPT' },
             ];
         },
+
+        /* ---------- Style helpers ---------- */
+
+        subTabBarStyle() {
+            return {
+                display: 'flex',
+                gap: '0',
+                borderBottom: '1px solid #e5e7eb',
+                marginBottom: '24px',
+                background: '#fff',
+            };
+        },
+
+        subTabStyle() {
+            return {
+                background: 'none',
+                border: 'none',
+                borderBottom: '3px solid transparent',
+                padding: '12px 20px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: '#6b7280',
+                whiteSpace: 'nowrap',
+                fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
+                transition: 'all 0.15s ease',
+            };
+        },
+
+        activeSubTabStyle() {
+            return {
+                ...this.subTabStyle,
+                color: '#1a73e8',
+                borderBottomColor: '#1a73e8',
+                fontWeight: '600',
+            };
+        },
+
+        cardStyle() {
+            return {
+                background: '#fff',
+                borderRadius: '10px',
+                padding: '24px',
+                border: '1px solid #e5e7eb',
+                maxWidth: '560px',
+            };
+        },
+
+        cardTitleStyle() {
+            return {
+                fontSize: '18px',
+                fontWeight: '700',
+                color: '#1a1a2e',
+                margin: '0 0 20px 0',
+                fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
+            };
+        },
+
+        fieldWrapStyle() {
+            return { marginBottom: '16px' };
+        },
+
+        linkTextStyle() {
+            return {
+                marginTop: '16px',
+                fontSize: '13px',
+                color: '#6b7280',
+            };
+        },
+
+        linkAStyle() {
+            return {
+                color: '#1a73e8',
+                textDecoration: 'underline',
+            };
+        },
+
+        statusRowStyle() {
+            return {
+                display: 'flex',
+                alignItems: 'center',
+                marginBottom: '16px',
+            };
+        },
+
+        statusDotStyle() {
+            return {
+                display: 'inline-block',
+                width: '10px',
+                height: '10px',
+                borderRadius: '50%',
+                background: '#22c55e',
+                marginRight: '8px',
+                flexShrink: '0',
+            };
+        },
+
+        connectedLabelStyle() {
+            return {
+                color: '#16a34a',
+                fontWeight: '600',
+                fontSize: '15px',
+            };
+        },
+
+        metaBlockStyle() {
+            return {
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px',
+            };
+        },
+
+        metaLineStyle() {
+            return {
+                display: 'flex',
+                gap: '8px',
+                fontSize: '14px',
+            };
+        },
+
+        metaKeyStyle() {
+            return {
+                color: '#6b7280',
+                minWidth: '130px',
+            };
+        },
+
+        metaValStyle() {
+            return {
+                color: '#1a1a2e',
+                fontWeight: '500',
+            };
+        },
+
+        confirmBoxStyle() {
+            return {
+                marginTop: '16px',
+                padding: '16px',
+                background: '#fef2f2',
+                borderRadius: '8px',
+                border: '1px solid #fecaca',
+            };
+        },
+
+        confirmTextStyle() {
+            return {
+                margin: '0 0 12px 0',
+                fontSize: '14px',
+                color: '#dc2626',
+                fontWeight: '500',
+            };
+        },
+
+        confirmBtnRowStyle() {
+            return {
+                display: 'flex',
+                gap: '8px',
+            };
+        },
+
+        descStyle() {
+            return {
+                fontSize: '14px',
+                color: '#6b7280',
+                marginBottom: '20px',
+                marginTop: '-12px',
+            };
+        },
+
+        emptyTextStyle() {
+            return {
+                fontSize: '14px',
+                color: '#9ca3af',
+                fontStyle: 'italic',
+                marginBottom: '16px',
+            };
+        },
+
+        fieldListStyle() {
+            return {
+                listStyle: 'none',
+                padding: '0',
+                margin: '0 0 20px 0',
+            };
+        },
+
+        fieldItemStyle() {
+            return {
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '10px 0',
+                borderBottom: '1px solid #f3f4f6',
+                fontSize: '14px',
+                color: '#374151',
+            };
+        },
     },
 
     created() {
@@ -198,6 +446,20 @@ Component.register('falara-settings', {
     },
 
     methods: {
+        onSubTabHover(event, key) {
+            if (this.activeTab !== key) {
+                event.target.style.color = '#1a73e8';
+                event.target.style.background = '#f0f4ff';
+            }
+        },
+
+        onSubTabLeave(event, key) {
+            if (this.activeTab !== key) {
+                event.target.style.color = '#6b7280';
+                event.target.style.background = 'none';
+            }
+        },
+
         async initSalesChannel() {
             const salesChannelRepository = Shopware.Service('repositoryFactory').create('sales_channel');
             const salesChannels = await salesChannelRepository.search(
@@ -229,8 +491,16 @@ Component.register('falara-settings', {
             try {
                 const falaraApiService = Shopware.Service('falaraApiService');
                 const resp = await falaraApiService.getConnection(this.salesChannelId);
-                this.connectionData = resp.data || {};
-                this.isConnected = !!(resp.data && resp.data.connected);
+                const conn = resp.data && resp.data.connection;
+                this.isConnected = !!(conn && !conn.disconnectedAt);
+                if (this.isConnected) {
+                    this.connectionData = {
+                        accountId: conn.falaraAccountId,
+                        connectedAt: conn.connectedAt || null,
+                    };
+                } else {
+                    this.connectionData = {};
+                }
             } catch (e) {
                 this.isConnected = false;
                 this.connectionData = {};
@@ -253,14 +523,10 @@ Component.register('falara-settings', {
             try {
                 const falaraApiService = Shopware.Service('falaraApiService');
                 const resp = await falaraApiService.getCustomFields(this.salesChannelId);
-                this.customFields = resp.data?.fields || [];
+                this.customFields = resp.data && resp.data.fields ? resp.data.fields : [];
             } catch (e) {
                 this.customFields = [];
             }
-        },
-
-        onTabChange(tab) {
-            this.activeTab = typeof tab === 'object' ? tab.name : tab;
         },
 
         async connect() {
@@ -272,20 +538,16 @@ Component.register('falara-settings', {
                 await this.loadConnection();
                 Shopware.State.dispatch('notification/createNotification', {
                     type: 'success',
-                    message: this.$t('falara-translation-manager.general.success'),
+                    message: 'Connected successfully.',
                 });
             } catch (e) {
                 Shopware.State.dispatch('notification/createNotification', {
                     type: 'error',
-                    message: this.$t('falara-translation-manager.general.error'),
+                    message: 'Connection failed. Please check your API key.',
                 });
             } finally {
                 this.isConnecting = false;
             }
-        },
-
-        confirmDisconnect() {
-            this.showDisconnectConfirm = true;
         },
 
         async disconnect() {
@@ -297,12 +559,12 @@ Component.register('falara-settings', {
                 await this.loadConnection();
                 Shopware.State.dispatch('notification/createNotification', {
                     type: 'success',
-                    message: this.$t('falara-translation-manager.general.success'),
+                    message: 'Disconnected successfully.',
                 });
             } catch (e) {
                 Shopware.State.dispatch('notification/createNotification', {
                     type: 'error',
-                    message: this.$t('falara-translation-manager.general.error'),
+                    message: 'Disconnect failed. Please try again.',
                 });
             } finally {
                 this.isDisconnecting = false;
@@ -328,12 +590,12 @@ Component.register('falara-settings', {
                 await falaraApiService.saveCustomFields(this.salesChannelId, this.customFields);
                 Shopware.State.dispatch('notification/createNotification', {
                     type: 'success',
-                    message: this.$t('falara-translation-manager.general.success'),
+                    message: 'Custom fields saved.',
                 });
             } catch (e) {
                 Shopware.State.dispatch('notification/createNotification', {
                     type: 'error',
-                    message: this.$t('falara-translation-manager.general.error'),
+                    message: 'Failed to save custom fields.',
                 });
             } finally {
                 this.isSaving = false;
@@ -347,15 +609,28 @@ Component.register('falara-settings', {
                 await falaraApiService.saveDefaults(this.salesChannelId, this.defaults);
                 Shopware.State.dispatch('notification/createNotification', {
                     type: 'success',
-                    message: this.$t('falara-translation-manager.general.success'),
+                    message: 'Defaults saved.',
                 });
             } catch (e) {
                 Shopware.State.dispatch('notification/createNotification', {
                     type: 'error',
-                    message: this.$t('falara-translation-manager.general.error'),
+                    message: 'Failed to save defaults.',
                 });
             } finally {
                 this.isSaving = false;
+            }
+        },
+
+        formatDate(dateStr) {
+            if (!dateStr) return '';
+            try {
+                return new Date(dateStr).toLocaleDateString(undefined, {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                });
+            } catch (e) {
+                return dateStr;
             }
         },
     },
