@@ -4,7 +4,6 @@ namespace Falara\TranslationManager\Service;
 
 use Falara\TranslationManager\Exception\FalaraApiException;
 use GuzzleHttp\Client;
-use GuzzleHttp\ClientInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -19,7 +18,7 @@ class ConnectionService
         private readonly EntityRepository $jobRepository,
         private readonly EncryptionService $encryption,
         private readonly string $falaraApiUrl,
-        private readonly ClientInterface $httpClient,
+
     ) {}
 
     public function connect(string $apiKey, string $salesChannelId, string $webhookUrl, Context $context): array

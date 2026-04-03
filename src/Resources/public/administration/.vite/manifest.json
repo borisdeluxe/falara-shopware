@@ -1,0 +1,24 @@
+{
+  "main.js": {
+    "file": "assets/falara-translation-manager-CeDNpWR2.js",
+    "name": "falara-translation-manager",
+    "src": "main.js",
+    "isEntry": true,
+    "dynamicImports": [
+      "module/falara-translation-manager/snippet/de-DE.json",
+      "module/falara-translation-manager/snippet/en-GB.json"
+    ]
+  },
+  "module/falara-translation-manager/snippet/de-DE.json": {
+    "file": "assets/de-DE-CTLn2U6y.js",
+    "name": "de-DE",
+    "src": "module/falara-translation-manager/snippet/de-DE.json",
+    "isDynamicEntry": true
+  },
+  "module/falara-translation-manager/snippet/en-GB.json": {
+    "file": "assets/en-GB-Cpj3ozAp.js",
+    "name": "en-GB",
+    "src": "module/falara-translation-manager/snippet/en-GB.json",
+    "isDynamicEntry": true
+  }
+}

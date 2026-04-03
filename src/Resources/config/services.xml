@@ -5,7 +5,7 @@
 
     <parameters>
         <parameter key="falara.api_url">https://falara.io</parameter>
-        <parameter key="falara.encryption_key"></parameter>
+        <parameter key="falara.encryption_key">d97433877ff3d3b54ea242441fa1cb7fb59bbee343cae17bc66c153e89ee4226</parameter>
     </parameters>
 
     <services>
@@ -45,7 +45,6 @@
             <argument type="service" id="falara_job.repository"/>
             <argument type="service" id="Falara\TranslationManager\Service\EncryptionService"/>
             <argument>%falara.api_url%</argument>
-            <argument type="service" id="GuzzleHttp\ClientInterface"/>
         </service>
 
         <service id="Falara\TranslationManager\Service\TranslationWriter">
@@ -118,7 +117,7 @@
             <argument type="service" id="logger"/>
             <argument type="service" id="falara_job.repository"/>
             <argument type="service" id="Falara\TranslationManager\Service\ConnectionService"/>
-            <argument type="service" id="messenger.bus.shopware"/>
+            <argument type="service" id="messenger.bus.default"/>
             <argument type="service" id="Doctrine\DBAL\Connection"/>
             <tag name="messenger.message_handler"/>
         </service>
@@ -130,7 +129,7 @@
         <service id="Falara\TranslationManager\Command\PollJobsCommand">
             <argument type="service" id="falara_job.repository"/>
             <argument type="service" id="Falara\TranslationManager\Service\ConnectionService"/>
-            <argument type="service" id="messenger.bus.shopware"/>
+            <argument type="service" id="messenger.bus.default"/>
             <argument type="service" id="Doctrine\DBAL\Connection"/>
             <argument type="service" id="logger"/>
             <tag name="console.command"/>
@@ -165,7 +164,7 @@
 
         <service id="Falara\TranslationManager\Controller\Api\JobController" public="true">
             <argument type="service" id="falara_job.repository"/>
-            <argument type="service" id="messenger.bus.shopware"/>
+            <argument type="service" id="messenger.bus.default"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
@@ -192,7 +191,7 @@
         <service id="Falara\TranslationManager\Controller\Webhook\WebhookController" public="true">
             <argument type="service" id="falara_job.repository"/>
             <argument type="service" id="Falara\TranslationManager\Service\ConnectionService"/>
-            <argument type="service" id="messenger.bus.shopware"/>
+            <argument type="service" id="messenger.bus.default"/>
             <argument type="service" id="logger"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
