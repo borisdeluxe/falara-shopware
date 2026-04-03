@@ -60,14 +60,14 @@ class FalaraApiService {
 
     getSnippetSubgroups(salesChannelId, group) {
         return this.httpClient.get(
-            `${this.basePath}/content/${salesChannelId}/snippet/subgroups`,
+            `${this.basePath}/snippet-subgroups/${salesChannelId}`,
             { params: { group }, headers: this.getHeaders() }
         );
     }
 
     getSnippetGroups(salesChannelId) {
         return this.httpClient.get(
-            `${this.basePath}/content/${salesChannelId}/snippet/groups`,
+            `${this.basePath}/snippet-groups/${salesChannelId}`,
             { headers: this.getHeaders() }
         );
     }

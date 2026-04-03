@@ -69,7 +69,7 @@ class ContentController extends AbstractController
 
 
     #[Route(
-        path: '/api/_action/falara/content/{salesChannelId}/snippet/subgroups',
+        path: '/api/_action/falara/snippet-subgroups/{salesChannelId}',
         name: 'api.action.falara.content.snippet.subgroups',
         methods: ['GET'],
     )]
@@ -118,7 +118,7 @@ class ContentController extends AbstractController
     }
 
     #[Route(
-        path: '/api/_action/falara/content/{salesChannelId}/snippet/groups',
+        path: '/api/_action/falara/snippet-groups/{salesChannelId}',
         name: 'api.action.falara.content.snippet.groups',
         methods: ['GET'],
     )]
