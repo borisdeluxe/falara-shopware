@@ -36,7 +36,8 @@ class FalaraApiClient
 
     public function getGlossaries(): array
     {
-        return $this->get('v1/glossaries');
+        $response = $this->get('v1/glossaries');
+        return $response['data'] ?? $response;
     }
 
     public function createTranslationJob(
