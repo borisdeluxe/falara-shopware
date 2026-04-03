@@ -25,24 +25,46 @@ Component.register('falara-content', {
                     </div>
 
                     <!-- Snippet Group Filter -->
-                    <div v-if="activeTab === 'snippet' && snippetGroups.length > 0" :style="{ marginBottom: '16px' }">
-                        <label :style="{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }">
-                            Snippet Group
-                        </label>
-                        <select
-                            :value="selectedSnippetGroup"
-                            @change="onSnippetGroupChange($event.target.value)"
-                            :style="selectStyle"
-                        >
-                            <option value="">All groups ({{ snippetGroupTotal }})</option>
-                            <option
-                                v-for="group in snippetGroups"
-                                :key="group.name"
-                                :value="group.name"
+                    <!-- Snippet Group / Subgroup Filters -->
+                    <div v-if="activeTab === 'snippet' && snippetGroups.length > 0" :style="{ marginBottom: '16px', display: 'flex', gap: '16px', alignItems: 'flex-end', flexWrap: 'wrap' }">
+                        <div>
+                            <label :style="{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }">
+                                Snippet Group
+                            </label>
+                            <select
+                                :value="selectedSnippetGroup"
+                                @change="onSnippetGroupChange($event.target.value)"
+                                :style="selectStyle"
                             >
-                                {{ group.name }} ({{ group.snippetCount }})
-                            </option>
-                        </select>
+                                <option value="">All groups ({{ snippetGroupTotal }})</option>
+                                <option
+                                    v-for="group in snippetGroups"
+                                    :key="group.name"
+                                    :value="group.name"
+                                >
+                                    {{ group.name }} ({{ group.snippetCount }})
+                                </option>
+                            </select>
+                        </div>
+                        <div v-if="selectedSnippetGroup && snippetSubgroups.length > 0">
+                            <label :style="{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }">
+                                Key Prefix
+                            </label>
+                            <select
+                                :value="selectedSnippetSubgroup"
+                                @change="onSnippetSubgroupChange($event.target.value)"
+                                :style="selectStyle"
+                            >
+                                <option value="">All prefixes</option>
+                                <option
+                                    v-for="sub in snippetSubgroups"
+                                    :key="sub.name"
+                                    :value="sub.name"
+                                >
+                                    {{ sub.name }} ({{ sub.snippetCount }})
+                                </option>
+                            </select>
+                        </div>
                     </div>
 
                     <!-- Toolbar -->
@@ -147,6 +169,8 @@ Component.register('falara-content', {
             translationDefaults: {},
             snippetGroups: [],
             selectedSnippetGroup: '',
+            snippetSubgroups: [],
+            selectedSnippetSubgroup: '',
         };
     },
 
@@ -343,6 +367,17 @@ Component.register('falara-content', {
             }
         },
 
+        async loadSnippetSubgroups() {
+            if (!this.salesChannelId || !this.selectedSnippetGroup) return;
+            try {
+                const falaraApiService = Shopware.Service(falaraApiService);
+                const resp = await falaraApiService.getSnippetSubgroups(this.salesChannelId, this.selectedSnippetGroup);
+                this.snippetSubgroups = resp.data?.subgroups || [];
+            } catch (e) {
+                this.snippetSubgroups = [];
+            }
+        },
+
         async loadItems() {
             if (!this.salesChannelId) return;
             this.isLoading = true;
@@ -354,9 +389,12 @@ Component.register('falara-content', {
                     search: this.searchTerm,
                 };
 
-                // Pass group filter for snippets
+                // Pass group / subgroup filters for snippets
                 if (this.activeTab === 'snippet' && this.selectedSnippetGroup) {
                     params.group = this.selectedSnippetGroup;
+                    if (this.selectedSnippetSubgroup) {
+                        params.subgroup = this.selectedSnippetSubgroup;
+                    }
                 }
 
                 const resp = await falaraApiService.getContentItems(this.salesChannelId, this.activeTab, params);
@@ -377,6 +415,8 @@ Component.register('falara-content', {
             this.currentPage = 1;
             this.selectedSnippetGroup = '';
             this.snippetGroups = [];
+            this.selectedSnippetSubgroup = '';
+            this.snippetSubgroups = [];
             this.$router.replace({ params: { type: this.activeTab } });
 
             if (tabName === 'snippet') {
@@ -388,6 +428,19 @@ Component.register('falara-content', {
 
         onSnippetGroupChange(value) {
             this.selectedSnippetGroup = value;
+            this.selectedSnippetSubgroup = "";
+            this.snippetSubgroups = [];
+            this.currentPage = 1;
+            this.selectedItems = [];
+            if (value) {
+                this.loadSnippetSubgroups().then(() => this.loadItems());
+            } else {
+                this.loadItems();
+            }
+        },
+
+        onSnippetSubgroupChange(value) {
+            this.selectedSnippetSubgroup = value;
             this.currentPage = 1;
             this.selectedItems = [];
             this.loadItems();
