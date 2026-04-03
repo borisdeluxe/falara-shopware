@@ -370,7 +370,7 @@ Component.register('falara-content', {
         async loadSnippetSubgroups() {
             if (!this.salesChannelId || !this.selectedSnippetGroup) return;
             try {
-                const falaraApiService = Shopware.Service(falaraApiService);
+                const falaraApiService = Shopware.Service('falaraApiService');
                 const resp = await falaraApiService.getSnippetSubgroups(this.salesChannelId, this.selectedSnippetGroup);
                 this.snippetSubgroups = resp.data?.subgroups || [];
             } catch (e) {
