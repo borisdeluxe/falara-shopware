@@ -3,6 +3,7 @@ const { Component } = Shopware;
 Component.register('falara-settings', {
     template: `
         <div class="falara-settings">
+            <falara-nav-tabs />
             <mt-card :title="$t('falara-translation-manager.settings.title')">
                 <mt-tabs
                     :items="tabItems"

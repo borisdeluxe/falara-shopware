@@ -3,6 +3,7 @@ const { Component } = Shopware;
 Component.register('falara-job-detail', {
     template: `
         <div class="falara-job-detail">
+            <falara-nav-tabs />
             <mt-card :title="$t('falara-translation-manager.jobDetail.title')">
                 <mt-button variant="ghost" @click="goBack" class="falara-job-detail__back">
                     ← {{ $t('falara-translation-manager.jobDetail.back') }}

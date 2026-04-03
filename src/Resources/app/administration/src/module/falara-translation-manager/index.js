@@ -7,6 +7,7 @@ import './page/falara-settings';
 import './component/falara-status-badge';
 import './component/falara-quota-widget';
 import './component/falara-translate-modal';
+import './component/falara-nav-tabs';
 
 const { Module } = Shopware;
 
