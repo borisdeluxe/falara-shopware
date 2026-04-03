@@ -18,7 +18,7 @@ Component.register('falara-translate-modal', {
                         <input
                             type="checkbox"
                             :id="'lang-' + lang.id"
-                            :value="lang.id"
+                            :value="lang.code"
                             v-model="selectedLanguages"
                             :style="checkboxStyle"
                         />
@@ -241,6 +241,34 @@ Component.register('falara-translate-modal', {
     },
 
     methods: {
+        getLanguageList() {
+            return [
+                { id: 'de', name: 'German (de)', code: 'de' },
+                { id: 'en', name: 'English (en)', code: 'en' },
+                { id: 'fr', name: 'French (fr)', code: 'fr' },
+                { id: 'es', name: 'Spanish (es)', code: 'es' },
+                { id: 'it', name: 'Italian (it)', code: 'it' },
+                { id: 'nl', name: 'Dutch (nl)', code: 'nl' },
+                { id: 'pl', name: 'Polish (pl)', code: 'pl' },
+                { id: 'pt', name: 'Portuguese (pt)', code: 'pt' },
+                { id: 'cs', name: 'Czech (cs)', code: 'cs' },
+                { id: 'da', name: 'Danish (da)', code: 'da' },
+                { id: 'sv', name: 'Swedish (sv)', code: 'sv' },
+                { id: 'fi', name: 'Finnish (fi)', code: 'fi' },
+                { id: 'no', name: 'Norwegian (no)', code: 'no' },
+                { id: 'hu', name: 'Hungarian (hu)', code: 'hu' },
+                { id: 'ro', name: 'Romanian (ro)', code: 'ro' },
+                { id: 'bg', name: 'Bulgarian (bg)', code: 'bg' },
+                { id: 'hr', name: 'Croatian (hr)', code: 'hr' },
+                { id: 'sk', name: 'Slovak (sk)', code: 'sk' },
+                { id: 'sl', name: 'Slovenian (sl)', code: 'sl' },
+                { id: 'el', name: 'Greek (el)', code: 'el' },
+                { id: 'tr', name: 'Turkish (tr)', code: 'tr' },
+                { id: 'ru', name: 'Russian (ru)', code: 'ru' },
+                { id: 'uk', name: 'Ukrainian (uk)', code: 'uk' },
+            ];
+        },
+
         applyDefaults() {
             if (this.defaults) {
                 this.form.domain = this.defaults.domain || '';
@@ -257,17 +285,7 @@ Component.register('falara-translate-modal', {
         },
 
         loadLanguages() {
-            const languageRepository = Shopware.Service('repositoryFactory').create('language');
-            const criteria = new Shopware.Data.Criteria();
-            criteria.addAssociation('locale');
-            languageRepository.search(criteria, Shopware.Context.api).then(result => {
-                this.availableLanguages = result.map(lang => ({
-                    id: lang.id,
-                    name: lang.name || lang.locale?.name || lang.id,
-                }));
-            }).catch(() => {
-                this.availableLanguages = [];
-            });
+            this.availableLanguages = this.getLanguageList();
         },
 
         loadGlossaries() {
