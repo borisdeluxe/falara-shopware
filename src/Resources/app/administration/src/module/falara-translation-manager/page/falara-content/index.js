@@ -478,7 +478,22 @@ Component.register('falara-content', {
             this.isLoading = true;
             try {
                 const falaraApiService = Shopware.Service('falaraApiService');
-                await falaraApiService.translate(data);
+                const payload = {
+                    salesChannelId: this.salesChannelId,
+                    resourceType: this.activeTab,
+                    entityIds: data.items.map(i => i.id),
+                    sourceLocale: Shopware.Context.api.systemLanguageId,
+                    targetLocales: data.targetLanguages,
+                    sourceLang: 'en',
+                    options: {
+                        quality: data.quality || 'standard',
+                        domain: data.domain || undefined,
+                        tone: data.tone || undefined,
+                        instructions: data.instructions || undefined,
+                        glossary_ids: data.glossaryId ? [data.glossaryId] : undefined,
+                    },
+                };
+                await falaraApiService.translate(payload);
                 this.selectedItems = [];
                 Shopware.State.dispatch('notification/createNotification', {
                     type: 'success',

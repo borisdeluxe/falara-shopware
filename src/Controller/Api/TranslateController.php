@@ -75,9 +75,15 @@ class TranslateController extends AbstractController
             }
         }
 
-        // Export content
+        // Determine source language ID for DAL export and BCP-47 code for API
+        $sourceLanguageId = $sourceLocale;
+        $sourceLang = $data['sourceLang'] ?? 'en';
+
+        // Export content using Shopware language ID
         try {
-            $texts = $contentType->export($entityIds, $sourceLocale, $context);
+            $exportResult = $contentType->export($entityIds, $sourceLanguageId, $context);
+            $texts = $exportResult['texts'] ?? $exportResult;
+            $warnings = $exportResult['warnings'] ?? [];
         } catch (\Throwable $e) {
             return new JsonResponse(['error' => 'Export failed: ' . $e->getMessage()], 500);
         }
@@ -86,10 +92,12 @@ class TranslateController extends AbstractController
             return new JsonResponse(['error' => 'No translatable content found for the given entity IDs.'], 422);
         }
 
+        $exportWarnings = !empty($warnings) ? array_map(fn($w) => $w->toArray(), $warnings) : null;
+
         // Submit to Falara API
         try {
             $apiClient = $this->connectionService->getApiClient($salesChannelId, $context);
-            $batch     = $apiClient->createTranslationJob($texts, $sourceLocale, $targetLocales, $options);
+            $batch     = $apiClient->createTranslationJob($texts, $sourceLang, $targetLocales, $options);
         } catch (\Throwable $e) {
             return new JsonResponse(['error' => 'Falara API submission failed: ' . $e->getMessage()], 502);
         }
@@ -104,7 +112,7 @@ class TranslateController extends AbstractController
 
             // Single-target batches have one job per target locale in request order;
             // multi-target responses carry target_lang in each job entry.
-            $targetLocale = $apiJob['target_lang'] ?? ($targetLocales[0] ?? '');
+            $targetLocale = $apiJob['target_language'] ?? $apiJob['target_lang'] ?? ($targetLocales[0] ?? '');
             $falaraJobId  = $apiJob['job_id'] ?? '';
 
             $jobRecords[] = [
