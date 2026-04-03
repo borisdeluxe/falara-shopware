@@ -37,5 +37,10 @@
             "de-DE": "KI-gestützte Übersetzungen für Ihren Shopware Shop mit Multi-Provider Support (DeepL, Claude, Gemini, ChatGPT)",
             "en-GB": "AI-powered translations for your Shopware store with multi-provider support (DeepL, Claude, Gemini, ChatGPT)"
         }
+    },
+    "config": {
+        "allow-plugins": {
+            "symfony/runtime": true
+        }
     }
 }
