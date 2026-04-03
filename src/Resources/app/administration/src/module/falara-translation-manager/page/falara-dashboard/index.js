@@ -111,7 +111,7 @@ Component.register('falara-dashboard', {
 
                 try {
                     const connResp = await falaraApiService.getConnection(this.salesChannelId);
-                    this.isConnected = !!(connResp.data && connResp.data.connected);
+                    this.isConnected = !!(connResp.data && connResp.data.connection && !connResp.data.connection.disconnectedAt);
                 } catch (e) {
                     this.isConnected = false;
                 }
