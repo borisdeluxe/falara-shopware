@@ -24,6 +24,27 @@ Component.register('falara-content', {
                         </button>
                     </div>
 
+                    <!-- Snippet Group Filter -->
+                    <div v-if="activeTab === 'snippet' && snippetGroups.length > 0" :style="{ marginBottom: '16px' }">
+                        <label :style="{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }">
+                            Snippet Group
+                        </label>
+                        <select
+                            :value="selectedSnippetGroup"
+                            @change="onSnippetGroupChange($event.target.value)"
+                            :style="selectStyle"
+                        >
+                            <option value="">All groups ({{ snippetGroupTotal }})</option>
+                            <option
+                                v-for="group in snippetGroups"
+                                :key="group.name"
+                                :value="group.name"
+                            >
+                                {{ group.name }} ({{ group.snippetCount }})
+                            </option>
+                        </select>
+                    </div>
+
                     <!-- Toolbar -->
                     <div :style="{ display: 'flex', alignItems: 'flex-end', gap: '12px', marginBottom: '16px' }">
                         <div :style="{ flex: 1 }">
@@ -124,6 +145,8 @@ Component.register('falara-content', {
             showTranslateModal: false,
             salesChannelId: null,
             translationDefaults: {},
+            snippetGroups: [],
+            selectedSnippetGroup: '',
         };
     },
 
@@ -143,6 +166,26 @@ Component.register('falara-content', {
 
         selectedItemObjects() {
             return this.items.filter(item => this.selectedItems.includes(item.id));
+        },
+
+        snippetGroupTotal() {
+            return this.snippetGroups.reduce((sum, g) => sum + g.snippetCount, 0);
+        },
+
+        selectStyle() {
+            return {
+                width: '100%',
+                maxWidth: '400px',
+                padding: '8px 12px',
+                fontSize: '14px',
+                fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
+                border: '1px solid #d1d5db',
+                borderRadius: '6px',
+                background: '#ffffff',
+                color: '#374151',
+                cursor: 'pointer',
+                outline: 'none',
+            };
         },
 
         tabBarStyle() {
@@ -271,6 +314,9 @@ Component.register('falara-content', {
             if (salesChannels.length > 0) {
                 this.salesChannelId = salesChannels.first().id;
                 await this.loadDefaults();
+                if (this.activeTab === 'snippet') {
+                    await this.loadSnippetGroups();
+                }
                 await this.loadItems();
             }
         },
@@ -286,6 +332,17 @@ Component.register('falara-content', {
             }
         },
 
+        async loadSnippetGroups() {
+            if (!this.salesChannelId) return;
+            try {
+                const falaraApiService = Shopware.Service('falaraApiService');
+                const resp = await falaraApiService.getSnippetGroups(this.salesChannelId);
+                this.snippetGroups = resp.data?.groups || [];
+            } catch (e) {
+                this.snippetGroups = [];
+            }
+        },
+
         async loadItems() {
             if (!this.salesChannelId) return;
             this.isLoading = true;
@@ -296,6 +353,12 @@ Component.register('falara-content', {
                     limit: this.pageSize,
                     search: this.searchTerm,
                 };
+
+                // Pass group filter for snippets
+                if (this.activeTab === 'snippet' && this.selectedSnippetGroup) {
+                    params.group = this.selectedSnippetGroup;
+                }
+
                 const resp = await falaraApiService.getContentItems(this.salesChannelId, this.activeTab, params);
                 this.items = resp.data?.items || [];
                 this.totalItems = resp.data?.total || 0;
@@ -312,7 +375,21 @@ Component.register('falara-content', {
             this.activeTab = tabName;
             this.selectedItems = [];
             this.currentPage = 1;
+            this.selectedSnippetGroup = '';
+            this.snippetGroups = [];
             this.$router.replace({ params: { type: this.activeTab } });
+
+            if (tabName === 'snippet') {
+                this.loadSnippetGroups().then(() => this.loadItems());
+            } else {
+                this.loadItems();
+            }
+        },
+
+        onSnippetGroupChange(value) {
+            this.selectedSnippetGroup = value;
+            this.currentPage = 1;
+            this.selectedItems = [];
             this.loadItems();
         },
 

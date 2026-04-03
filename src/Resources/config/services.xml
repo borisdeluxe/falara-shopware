@@ -87,6 +87,9 @@
 
         <service id="Falara\TranslationManager\Core\ContentType\SnippetContentType">
             <argument type="service" id="snippet.repository"/>
+            <argument type="service" id="snippet_set.repository"/>
+            <argument type="service" id="language.repository"/>
+            <argument type="service" id="Shopware\Core\System\Snippet\Files\SnippetFileCollection"/>
             <argument type="service" id="Falara\TranslationManager\Service\WordCounter"/>
             <argument type="service" id="logger"/>
             <tag name="falara.content_type"/>
@@ -148,6 +151,7 @@
 
         <service id="Falara\TranslationManager\Controller\Api\ContentController" public="true">
             <argument type="service" id="Falara\TranslationManager\Core\ContentType\ContentTypeRegistry"/>
+            <argument type="service" id="sales_channel.repository"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>

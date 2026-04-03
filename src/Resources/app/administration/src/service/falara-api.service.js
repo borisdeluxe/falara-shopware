@@ -58,6 +58,13 @@ class FalaraApiService {
         );
     }
 
+    getSnippetGroups(salesChannelId) {
+        return this.httpClient.get(
+            `${this.basePath}/content/${salesChannelId}/snippet/groups`,
+            { headers: this.getHeaders() }
+        );
+    }
+
     translate(data) {
         return this.httpClient.post(
             `${this.basePath}/translate`,
