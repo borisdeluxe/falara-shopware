@@ -10,7 +10,7 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
-use Shopware\Core\System\Snippet\Files\SnippetFileCollection;
+use Shopware\Core\System\Snippet\Files\SnippetFileCollectionFactory;
 
 class SnippetContentType implements ContentTypeInterface
 {
@@ -18,7 +18,7 @@ class SnippetContentType implements ContentTypeInterface
         private readonly EntityRepository $snippetRepository,
         private readonly EntityRepository $snippetSetRepository,
         private readonly EntityRepository $languageRepository,
-        private readonly SnippetFileCollection $snippetFileCollection,
+        private readonly SnippetFileCollectionFactory $snippetFileCollectionFactory,
         private readonly WordCounter $wordCounter,
         private readonly LoggerInterface $logger,
     ) {}
@@ -274,6 +274,11 @@ class SnippetContentType implements ContentTypeInterface
         return $this->snippetSetRepository->search($criteria, $context)->first();
     }
 
+    private function getPopulatedSnippetFileCollection(): \Shopware\Core\System\Snippet\Files\SnippetFileCollection
+    {
+        return $this->snippetFileCollectionFactory->createSnippetFileCollection();
+    }
+
     private function getMergedSnippets(string $languageId, Context $context, ?string $group = null): array
     {
         $localeCode = $this->getLocaleCodeForLanguage($languageId, $context);
@@ -285,7 +290,13 @@ class SnippetContentType implements ContentTypeInterface
         $snippets = [];
 
         // 1. Load from JSON snippet files
-        $snippetFiles = $this->snippetFileCollection->getSnippetFilesByIso($localeCode);
+        // Try full locale code first (en-GB), then short code (en)
+        $collection = $this->getPopulatedSnippetFileCollection();
+        $snippetFiles = $collection->getSnippetFilesByIso($localeCode);
+        if (empty($snippetFiles)) {
+            $shortCode = substr($localeCode, 0, 2);
+            $snippetFiles = $collection->getSnippetFilesByIso($shortCode);
+        }
 
         foreach ($snippetFiles as $snippetFile) {
             $fileTechnicalName = $snippetFile->getTechnicalName();
