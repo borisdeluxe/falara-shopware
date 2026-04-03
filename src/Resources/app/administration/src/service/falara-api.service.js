@@ -1,23 +1,22 @@
 const { Application } = Shopware;
 
 class FalaraApiService {
-    constructor(httpClient, loginService, basePath = '_action/falara') {
+    constructor(httpClient, loginService) {
         this.httpClient = httpClient;
         this.loginService = loginService;
-        this.basePath = basePath;
-        this.name = 'falaraApiService';
+        this.basePath = "_action/falara";
     }
 
     getHeaders() {
         return {
             Authorization: `Bearer ${this.loginService.getToken()}`,
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
         };
     }
 
     connect(salesChannelId, apiKey) {
         return this.httpClient.post(
-            `${this.basePath}/connection/connect`,
+            `${this.basePath}/connect`,
             { salesChannelId, apiKey },
             { headers: this.getHeaders() }
         );
@@ -25,7 +24,7 @@ class FalaraApiService {
 
     disconnect(salesChannelId) {
         return this.httpClient.post(
-            `${this.basePath}/connection/disconnect`,
+            `${this.basePath}/disconnect`,
             { salesChannelId },
             { headers: this.getHeaders() }
         );
@@ -40,15 +39,21 @@ class FalaraApiService {
 
     getUsage(salesChannelId) {
         return this.httpClient.get(
-            `${this.basePath}/connection/${salesChannelId}/usage`,
+            `${this.basePath}/settings/usage/${salesChannelId}`,
             { headers: this.getHeaders() }
         );
     }
 
     getContentItems(salesChannelId, type, params = {}) {
-        const query = new URLSearchParams({ salesChannelId, type, ...params }).toString();
         return this.httpClient.get(
-            `${this.basePath}/content?${query}`,
+            `${this.basePath}/content/${salesChannelId}/${type}`,
+            { params, headers: this.getHeaders() }
+        );
+    }
+
+    getContentTypes() {
+        return this.httpClient.get(
+            `${this.basePath}/content-types`,
             { headers: this.getHeaders() }
         );
     }
@@ -62,30 +67,29 @@ class FalaraApiService {
     }
 
     getJobs(salesChannelId, params = {}) {
-        const query = new URLSearchParams({ salesChannelId, ...params }).toString();
         return this.httpClient.get(
-            `${this.basePath}/jobs?${query}`,
-            { headers: this.getHeaders() }
+            `${this.basePath}/jobs/${salesChannelId}`,
+            { params, headers: this.getHeaders() }
         );
     }
 
     getJob(jobId) {
         return this.httpClient.get(
-            `${this.basePath}/jobs/${jobId}`,
+            `${this.basePath}/jobs/detail/${jobId}`,
             { headers: this.getHeaders() }
         );
     }
 
     retryWriteBack(jobId) {
         return this.httpClient.post(
-            `${this.basePath}/jobs/${jobId}/retry-writeback`,
+            `${this.basePath}/jobs/${jobId}/retry`,
             {},
             { headers: this.getHeaders() }
         );
     }
 
     archiveJob(jobId) {
-        return this.httpClient.post(
+        return this.httpClient.patch(
             `${this.basePath}/jobs/${jobId}/archive`,
             {},
             { headers: this.getHeaders() }
@@ -93,23 +97,22 @@ class FalaraApiService {
     }
 
     runAudit(salesChannelId) {
-        return this.httpClient.post(
-            `${this.basePath}/audit`,
-            { salesChannelId },
+        return this.httpClient.get(
+            `${this.basePath}/audit/${salesChannelId}`,
             { headers: this.getHeaders() }
         );
     }
 
     getDefaults(salesChannelId) {
         return this.httpClient.get(
-            `${this.basePath}/settings/${salesChannelId}/defaults`,
+            `${this.basePath}/settings/defaults/${salesChannelId}`,
             { headers: this.getHeaders() }
         );
     }
 
     saveDefaults(salesChannelId, data) {
         return this.httpClient.post(
-            `${this.basePath}/settings/${salesChannelId}/defaults`,
+            `${this.basePath}/settings/defaults/${salesChannelId}`,
             data,
             { headers: this.getHeaders() }
         );
@@ -117,31 +120,35 @@ class FalaraApiService {
 
     getGlossaries(salesChannelId) {
         return this.httpClient.get(
-            `${this.basePath}/settings/${salesChannelId}/glossaries`,
+            `${this.basePath}/settings/glossaries/${salesChannelId}`,
             { headers: this.getHeaders() }
         );
     }
 
     getCustomFields(salesChannelId) {
         return this.httpClient.get(
-            `${this.basePath}/settings/${salesChannelId}/custom-fields`,
+            `${this.basePath}/settings/custom-fields/${salesChannelId}`,
             { headers: this.getHeaders() }
         );
     }
 
-    saveCustomFields(salesChannelId, fields) {
+    addCustomField(salesChannelId, fieldSetName, fieldName) {
         return this.httpClient.post(
-            `${this.basePath}/settings/${salesChannelId}/custom-fields`,
-            { fields },
+            `${this.basePath}/settings/custom-fields/${salesChannelId}`,
+            { fieldSetName, fieldName },
+            { headers: this.getHeaders() }
+        );
+    }
+
+    deleteCustomField(id) {
+        return this.httpClient.delete(
+            `${this.basePath}/settings/custom-fields/entry/${id}`,
             { headers: this.getHeaders() }
         );
     }
 }
 
-Application.addServiceProvider('falaraApiService', (container) => {
-    const initContainer = Application.getContainer('init');
-    return new FalaraApiService(
-        initContainer.httpClient,
-        container.loginService
-    );
+Application.addServiceProvider("falaraApiService", (container) => {
+    const initContainer = Application.getContainer("init");
+    return new FalaraApiService(initContainer.httpClient, container.loginService);
 });
