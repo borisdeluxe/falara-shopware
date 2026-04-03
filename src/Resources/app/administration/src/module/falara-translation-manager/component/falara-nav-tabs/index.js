@@ -2,68 +2,78 @@ const { Component } = Shopware;
 
 Component.register("falara-nav-tabs", {
     template: `
-        <div class="falara-nav-tabs">
-            <div class="falara-nav-tabs__header">
-                <h1 class="falara-nav-tabs__title">Falara Translation Manager</h1>
+        <div :style="containerStyle">
+            <div :style="headerStyle">
+                <h1 :style="titleStyle">Falara Translation Manager</h1>
             </div>
-            <nav class="falara-nav-tabs__bar">
+            <nav :style="barStyle">
                 <button
                     v-for="tab in tabs"
                     :key="tab.route"
-                    class="falara-nav-tabs__tab"
-                    :class="{ 'falara-nav-tabs__tab--active': isActive(tab.route) }"
+                    :style="isActive(tab.route) ? activeTabStyle : tabStyle"
                     @click="navigate(tab.route)"
+                    @mouseenter="$event.target.style.color = '#1a73e8'; $event.target.style.background = '#f0f4ff'"
+                    @mouseleave="!isActive(tab.route) && ($event.target.style.color = '#6b7280', $event.target.style.background = 'none')"
                 >
                     {{ $t(tab.label) }}
                 </button>
             </nav>
-            <style>
-                .falara-nav-tabs {
-                    background: #fff;
-                    border-bottom: 1px solid #d1d5db;
-                    margin: -24px -24px 24px -24px;
-                    padding: 0;
-                }
-                .falara-nav-tabs__header {
-                    padding: 20px 32px 0 32px;
-                }
-                .falara-nav-tabs__title {
-                    font-size: 24px;
-                    font-weight: 700;
-                    color: #1a1a2e;
-                    margin: 0 0 16px 0;
-                }
-                .falara-nav-tabs__bar {
-                    display: flex;
-                    gap: 0;
-                    padding: 0 32px;
-                }
-                .falara-nav-tabs__tab {
-                    background: none;
-                    border: none;
-                    border-bottom: 3px solid transparent;
-                    padding: 12px 20px;
-                    cursor: pointer;
-                    font-size: 14px;
-                    font-weight: 500;
-                    color: #6b7280;
-                    transition: all 0.15s ease;
-                    white-space: nowrap;
-                }
-                .falara-nav-tabs__tab:hover {
-                    color: #1a73e8;
-                    background: #f0f4ff;
-                }
-                .falara-nav-tabs__tab--active {
-                    color: #1a73e8;
-                    border-bottom-color: #1a73e8;
-                    font-weight: 600;
-                }
-            </style>
         </div>
     `,
 
     computed: {
+        containerStyle() {
+            return {
+                background: "#fff",
+                borderBottom: "1px solid #d1d5db",
+                margin: "-20px -20px 24px -20px",
+                padding: "0",
+                borderRadius: "8px 8px 0 0",
+            };
+        },
+        headerStyle() {
+            return { padding: "24px 32px 0 32px" };
+        },
+        titleStyle() {
+            return {
+                fontSize: "24px",
+                fontWeight: "700",
+                color: "#1a1a2e",
+                margin: "0 0 16px 0",
+                fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
+            };
+        },
+        barStyle() {
+            return {
+                display: "flex",
+                gap: "0",
+                padding: "0 32px",
+                borderTop: "1px solid #e5e7eb",
+            };
+        },
+        tabStyle() {
+            return {
+                background: "none",
+                border: "none",
+                borderBottom: "3px solid transparent",
+                padding: "14px 20px",
+                cursor: "pointer",
+                fontSize: "14px",
+                fontWeight: "500",
+                color: "#6b7280",
+                whiteSpace: "nowrap",
+                fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
+                transition: "all 0.15s ease",
+            };
+        },
+        activeTabStyle() {
+            return {
+                ...this.tabStyle,
+                color: "#1a73e8",
+                borderBottomColor: "#1a73e8",
+                fontWeight: "600",
+            };
+        },
         tabs() {
             return [
                 { route: "falara.translation.manager.dashboard", label: "falara-translation-manager.nav.dashboard" },
