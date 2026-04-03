@@ -4,56 +4,58 @@ Component.register('falara-audit', {
     template: `
         <div class="falara-audit">
             <falara-nav-tabs />
-            <mt-card :title="$t('falara-translation-manager.audit.title')">
-                <p class="falara-audit__description">{{ $t('falara-translation-manager.audit.description') }}</p>
+            <div :style="{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }">
+                <mt-card :title="$t('falara-translation-manager.audit.title')">
+                    <p class="falara-audit__description">{{ $t('falara-translation-manager.audit.description') }}</p>
 
-                <mt-button
-                    variant="primary"
-                    :disabled="isScanning"
-                    @click="runScan"
-                    class="falara-audit__scan-btn"
-                >
-                    {{ isScanning ? $t('falara-translation-manager.audit.scanning') : $t('falara-translation-manager.audit.runScan') }}
-                </mt-button>
+                    <mt-button
+                        variant="primary"
+                        :disabled="isScanning"
+                        @click="runScan"
+                        class="falara-audit__scan-btn"
+                    >
+                        {{ isScanning ? $t('falara-translation-manager.audit.scanning') : $t('falara-translation-manager.audit.runScan') }}
+                    </mt-button>
 
-                <mt-loader v-if="isScanning" />
+                    <mt-loader v-if="isScanning" />
 
-                <div v-else-if="results" class="falara-audit__results">
-                    <h3>{{ $t('falara-translation-manager.audit.results') }}</h3>
+                    <div v-else-if="results" class="falara-audit__results">
+                        <h3>{{ $t('falara-translation-manager.audit.results') }}</h3>
 
-                    <div v-if="results.recommendation" class="falara-audit__recommendation">
-                        {{ $t('falara-translation-manager.audit.planRecommendation', { plan: results.recommendation }) }}
-                    </div>
+                        <div v-if="results.recommendation" class="falara-audit__recommendation">
+                            {{ $t('falara-translation-manager.audit.planRecommendation', { plan: results.recommendation }) }}
+                        </div>
 
-                    <div class="falara-audit__breakdown">
-                        <div v-for="(langData, langCode) in results.byLanguage" :key="langCode" class="falara-audit__language-section">
-                            <h4>{{ langCode }}</h4>
-                            <table class="falara-audit__table">
-                                <thead>
-                                    <tr>
-                                        <th>{{ $t('falara-translation-manager.audit.type') }}</th>
-                                        <th>{{ $t('falara-translation-manager.audit.total') }}</th>
-                                        <th>{{ $t('falara-translation-manager.audit.missing') }}</th>
-                                        <th>{{ $t('falara-translation-manager.audit.coverage') }}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="(typeData, typeName) in langData" :key="typeName">
-                                        <td>{{ typeName }}</td>
-                                        <td>{{ typeData.total }}</td>
-                                        <td>{{ typeData.missing }}</td>
-                                        <td>{{ coveragePercent(typeData) }}%</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <div class="falara-audit__breakdown">
+                            <div v-for="(langData, langCode) in results.byLanguage" :key="langCode" class="falara-audit__language-section">
+                                <h4>{{ langCode }}</h4>
+                                <table class="falara-audit__table">
+                                    <thead>
+                                        <tr>
+                                            <th>{{ $t('falara-translation-manager.audit.type') }}</th>
+                                            <th>{{ $t('falara-translation-manager.audit.total') }}</th>
+                                            <th>{{ $t('falara-translation-manager.audit.missing') }}</th>
+                                            <th>{{ $t('falara-translation-manager.audit.coverage') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(typeData, typeName) in langData" :key="typeName">
+                                            <td>{{ typeName }}</td>
+                                            <td>{{ typeData.total }}</td>
+                                            <td>{{ typeData.missing }}</td>
+                                            <td>{{ coveragePercent(typeData) }}%</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div v-else class="falara-audit__empty">
-                    <p>{{ $t('falara-translation-manager.audit.noResults') }}</p>
-                </div>
-            </mt-card>
+                    <div v-else class="falara-audit__empty">
+                        <p>{{ $t('falara-translation-manager.audit.noResults') }}</p>
+                    </div>
+                </mt-card>
+            </div>
         </div>
     `,
 

@@ -5,192 +5,208 @@ Component.register('falara-settings', {
         <div>
             <falara-nav-tabs />
 
-            <mt-loader v-if="isLoading" />
+            <div :style="{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }">
+                <mt-loader v-if="isLoading" />
 
-            <div v-else>
-                <!-- Sub-tab bar -->
-                <div :style="subTabBarStyle">
-                    <button
-                        v-for="tab in subTabs"
-                        :key="tab.key"
-                        :style="activeTab === tab.key ? activeSubTabStyle : subTabStyle"
-                        @click="activeTab = tab.key"
-                        @mouseenter="onSubTabHover($event, tab.key)"
-                        @mouseleave="onSubTabLeave($event, tab.key)"
-                    >
-                        {{ tab.label }}
-                    </button>
-                </div>
-
-                <!-- CONNECTION TAB -->
-                <div v-show="activeTab === 'connection'">
-
-                    <!-- NOT connected -->
-                    <div v-if="!isConnected" :style="cardStyle">
-                        <h2 :style="cardTitleStyle">Connect to Falara</h2>
-
-                        <div :style="fieldWrapStyle">
-                            <mt-text-field
-                                label="API Key"
-                                placeholder="Enter your Falara API key"
-                                v-model="connectForm.apiKey"
-                                type="password"
-                            />
-                        </div>
-
-                        <div :style="fieldWrapStyle">
-                            <mt-button
-                                variant="primary"
-                                :disabled="!connectForm.apiKey || isConnecting"
-                                @click="connect"
-                            >
-                                {{ isConnecting ? 'Connecting…' : 'Connect' }}
-                            </mt-button>
-                        </div>
-
-                        <p :style="linkTextStyle">
-                            Don't have an account?
-                            <a href="https://app.falara.io" target="_blank" :style="linkAStyle">Visit app.falara.io</a>
-                        </p>
+                <div v-else>
+                    <!-- Sub-tab bar -->
+                    <div :style="subTabBarStyle">
+                        <button
+                            v-for="tab in subTabs"
+                            :key="tab.key"
+                            :style="activeTab === tab.key ? activeSubTabStyle : subTabStyle"
+                            @click="activeTab = tab.key"
+                            @mouseenter="onSubTabHover($event, tab.key)"
+                            @mouseleave="onSubTabLeave($event, tab.key)"
+                        >
+                            {{ tab.label }}
+                        </button>
                     </div>
 
-                    <!-- CONNECTED -->
-                    <div v-else :style="cardStyle">
-                        <div :style="statusRowStyle">
-                            <span :style="statusDotStyle"></span>
-                            <span :style="connectedLabelStyle">Connected</span>
-                        </div>
+                    <!-- CONNECTION TAB -->
+                    <div v-show="activeTab === 'connection'">
 
-                        <div :style="metaBlockStyle">
-                            <div v-if="connectionData.accountName" :style="metaLineStyle">
-                                <span :style="metaKeyStyle">Name:</span>
-                                <span :style="metaValStyle">{{ connectionData.accountName }}</span>
+                        <!-- NOT connected -->
+                        <div v-if="!isConnected" :style="cardStyle">
+                            <h2 :style="cardTitleStyle">Connect to Falara</h2>
+
+                            <div :style="fieldWrapStyle">
+                                <mt-text-field
+                                    label="API Key"
+                                    placeholder="Enter your Falara API key"
+                                    v-model="connectForm.apiKey"
+                                    type="password"
+                                />
                             </div>
-                            <div v-if="connectionData.accountId" :style="metaLineStyle">
-                                <span :style="metaKeyStyle">Account ID:</span>
-                                <span :style="metaValStyle">{{ connectionData.accountId }}</span>
-                            </div>
-                            <div v-if="connectionData.plan" :style="metaLineStyle">
-                                <span :style="metaKeyStyle">Plan:</span>
-                                <span :style="metaValStyle">{{ connectionData.plan }}</span>
-                            </div>
-                            <div v-if="connectionData.connectedAt" :style="metaLineStyle">
-                                <span :style="metaKeyStyle">Connected since:</span>
-                                <span :style="metaValStyle">{{ formatDate(connectionData.connectedAt) }}</span>
-                            </div>
-                        </div>
 
-                        <div v-if="!showDisconnectConfirm" :style="{ marginTop: '16px' }">
-                            <mt-button
-                                variant="danger"
-                                size="small"
-                                :disabled="isDisconnecting"
-                                @click="showDisconnectConfirm = true"
-                            >
-                                {{ isDisconnecting ? 'Disconnecting…' : 'Disconnect' }}
-                            </mt-button>
-                        </div>
-
-                        <div v-else :style="confirmBoxStyle">
-                            <p :style="confirmTextStyle">Are you sure? This will cancel all pending jobs.</p>
-                            <div :style="confirmBtnRowStyle">
-                                <mt-button variant="danger" size="small" @click="disconnect">Yes</mt-button>
-                                <mt-button variant="ghost" size="small" @click="showDisconnectConfirm = false">No</mt-button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- CUSTOM FIELDS TAB -->
-                <div v-show="activeTab === 'customFields'">
-                    <div :style="cardStyle">
-                        <h2 :style="cardTitleStyle">Custom Fields</h2>
-                        <p :style="descStyle">Define additional custom fields to include in translations.</p>
-
-                        <div :style="fieldWrapStyle">
-                            <mt-text-field
-                                label="Field Name"
-                                v-model="newFieldName"
-                            />
-                        </div>
-                        <div :style="{ marginBottom: '20px' }">
-                            <mt-button variant="primary" @click="addCustomField" :disabled="!newFieldName">
-                                Add Field
-                            </mt-button>
-                        </div>
-
-                        <p v-if="customFields.length === 0" :style="emptyTextStyle">No custom fields added yet.</p>
-                        <ul v-else :style="fieldListStyle">
-                            <li
-                                v-for="(field, idx) in customFields"
-                                :key="idx"
-                                :style="fieldItemStyle"
-                            >
-                                <span>{{ field }}</span>
-                                <mt-button variant="ghost" size="small" @click="removeCustomField(idx)">
-                                    Remove
+                            <div :style="fieldWrapStyle">
+                                <mt-button
+                                    variant="primary"
+                                    :disabled="!connectForm.apiKey || isConnecting"
+                                    @click="connect"
+                                >
+                                    {{ isConnecting ? 'Connecting…' : 'Connect' }}
                                 </mt-button>
-                            </li>
-                        </ul>
+                            </div>
 
-                        <mt-button variant="primary" @click="saveCustomFields" :disabled="isSaving">
-                            {{ isSaving ? 'Saving…' : 'Save' }}
-                        </mt-button>
+                            <p :style="linkTextStyle">
+                                Don't have an account?
+                                <a href="https://app.falara.io" target="_blank" :style="linkAStyle">Visit app.falara.io</a>
+                            </p>
+                        </div>
+
+                        <!-- CONNECTED -->
+                        <div v-else :style="cardStyle">
+                            <div :style="statusRowStyle">
+                                <span :style="statusDotStyle"></span>
+                                <span :style="connectedLabelStyle">Connected</span>
+                            </div>
+
+                            <div :style="metaBlockStyle">
+                                <div v-if="connectionData.accountName" :style="metaLineStyle">
+                                    <span :style="metaKeyStyle">Name:</span>
+                                    <span :style="metaValStyle">{{ connectionData.accountName }}</span>
+                                </div>
+                                <div v-if="connectionData.accountId" :style="metaLineStyle">
+                                    <span :style="metaKeyStyle">Account ID:</span>
+                                    <span :style="metaValStyle">{{ connectionData.accountId }}</span>
+                                </div>
+                                <div v-if="connectionData.plan" :style="metaLineStyle">
+                                    <span :style="metaKeyStyle">Plan:</span>
+                                    <span :style="metaValStyle">{{ connectionData.plan }}</span>
+                                </div>
+                                <div v-if="connectionData.connectedAt" :style="metaLineStyle">
+                                    <span :style="metaKeyStyle">Connected since:</span>
+                                    <span :style="metaValStyle">{{ formatDate(connectionData.connectedAt) }}</span>
+                                </div>
+                            </div>
+
+                            <div v-if="!showDisconnectConfirm" :style="{ marginTop: '16px' }">
+                                <mt-button
+                                    variant="danger"
+                                    size="small"
+                                    :disabled="isDisconnecting"
+                                    @click="showDisconnectConfirm = true"
+                                >
+                                    {{ isDisconnecting ? 'Disconnecting…' : 'Disconnect' }}
+                                </mt-button>
+                            </div>
+
+                            <div v-else :style="confirmBoxStyle">
+                                <p :style="confirmTextStyle">Are you sure? This will cancel all pending jobs.</p>
+                                <div :style="confirmBtnRowStyle">
+                                    <mt-button variant="danger" size="small" @click="disconnect">Yes</mt-button>
+                                    <mt-button variant="ghost" size="small" @click="showDisconnectConfirm = false">No</mt-button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
 
-                <!-- DEFAULTS TAB -->
-                <div v-show="activeTab === 'defaults'">
-                    <div :style="cardStyle">
-                        <h2 :style="cardTitleStyle">Translation Defaults</h2>
+                    <!-- CUSTOM FIELDS TAB -->
+                    <div v-show="activeTab === 'customFields'">
+                        <div :style="cardStyle">
+                            <h2 :style="cardTitleStyle">Custom Fields</h2>
+                            <p :style="descStyle">Define additional custom fields to include in translations.</p>
 
-                        <div :style="fieldWrapStyle">
-                            <mt-text-field
-                                label="Source Language"
-                                v-model="defaults.sourceLanguage"
-                            />
+                            <div :style="fieldWrapStyle">
+                                <mt-text-field
+                                    label="Field Name"
+                                    v-model="newFieldName"
+                                />
+                            </div>
+                            <div :style="{ marginBottom: '20px' }">
+                                <mt-button variant="primary" @click="addCustomField" :disabled="!newFieldName">
+                                    Add Field
+                                </mt-button>
+                            </div>
+
+                            <p v-if="customFields.length === 0" :style="emptyTextStyle">No custom fields added yet.</p>
+                            <ul v-else :style="fieldListStyle">
+                                <li
+                                    v-for="(field, idx) in customFields"
+                                    :key="idx"
+                                    :style="fieldItemStyle"
+                                >
+                                    <span>{{ field }}</span>
+                                    <mt-button variant="ghost" size="small" @click="removeCustomField(idx)">
+                                        Remove
+                                    </mt-button>
+                                </li>
+                            </ul>
+
+                            <mt-button variant="primary" @click="saveCustomFields" :disabled="isSaving">
+                                {{ isSaving ? 'Saving…' : 'Save' }}
+                            </mt-button>
                         </div>
+                    </div>
 
-                        <div :style="fieldWrapStyle">
-                            <mt-text-field
-                                label="Domain"
-                                v-model="defaults.domain"
-                            />
+                    <!-- DEFAULTS TAB -->
+                    <div v-show="activeTab === 'defaults'">
+                        <div :style="cardStyle">
+                            <h2 :style="cardTitleStyle">Translation Defaults</h2>
+
+                            <div :style="fieldWrapStyle">
+                                <mt-text-field
+                                    label="Source Language"
+                                    v-model="defaults.sourceLanguage"
+                                />
+                            </div>
+
+                            <div :style="fieldWrapStyle">
+                                <mt-text-field
+                                    label="Domain"
+                                    v-model="defaults.domain"
+                                />
+                            </div>
+
+                            <div :style="fieldWrapStyle">
+                                <mt-text-field
+                                    label="Tone"
+                                    v-model="defaults.tone"
+                                />
+                            </div>
+
+                            <div :style="fieldWrapStyle">
+                                <mt-select
+                                    label="Quality"
+                                    v-model="defaults.quality"
+                                    :options="qualityOptions"
+                                />
+                            </div>
+
+                            <div :style="fieldWrapStyle">
+                                <label :style="nativeSelectLabelStyle">Provider</label>
+                                <select v-model="defaults.provider" :style="nativeSelectStyle">
+                                    <option value="">— Select provider —</option>
+                                    <option v-for="opt in providerOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+                                </select>
+                            </div>
+
+                            <!-- QA Info Box -->
+                            <div :style="qaBoxStyle">
+                                <div :style="qaIconWrapStyle">
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="10" cy="10" r="10" fill="#3b82f6"/>
+                                        <path d="M6 10.5L8.5 13L14 7.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div :style="qaTextWrapStyle">
+                                    <div :style="qaTitleStyle">{{ qaTitle }}</div>
+                                    <div :style="qaDescStyle">{{ qaDescription }}</div>
+                                </div>
+                            </div>
+
+                            <div :style="fieldWrapStyle">
+                                <mt-textarea
+                                    label="Instructions"
+                                    v-model="defaults.instructions"
+                                />
+                            </div>
+
+                            <mt-button variant="primary" @click="saveDefaults" :disabled="isSaving">
+                                {{ isSaving ? 'Saving…' : 'Save Defaults' }}
+                            </mt-button>
                         </div>
-
-                        <div :style="fieldWrapStyle">
-                            <mt-text-field
-                                label="Tone"
-                                v-model="defaults.tone"
-                            />
-                        </div>
-
-                        <div :style="fieldWrapStyle">
-                            <mt-select
-                                label="Quality"
-                                v-model="defaults.quality"
-                                :options="qualityOptions"
-                            />
-                        </div>
-
-                        <div :style="fieldWrapStyle">
-                            <mt-select
-                                label="Provider"
-                                v-model="defaults.provider"
-                                :options="providerOptions"
-                            />
-                        </div>
-
-                        <div :style="fieldWrapStyle">
-                            <mt-textarea
-                                label="Instructions"
-                                v-model="defaults.instructions"
-                            />
-                        </div>
-
-                        <mt-button variant="primary" @click="saveDefaults" :disabled="isSaving">
-                            {{ isSaving ? 'Saving…' : 'Save Defaults' }}
-                        </mt-button>
                     </div>
                 </div>
             </div>
@@ -225,6 +241,95 @@ Component.register('falara-settings', {
     },
 
     computed: {
+        isGerman() {
+            const locale = Shopware.State.get('session')?.currentLocale || '';
+            return locale.startsWith('de');
+        },
+
+        qaTitle() {
+            return this.isGerman
+                ? 'Automatische Qualitätssicherung'
+                : 'Automated Quality Assurance';
+        },
+
+        qaDescription() {
+            return this.isGerman
+                ? 'Mehrere automatisierte QA-Agenten prüfen jede Übersetzung auf Qualität — unabhängig von der gewählten Engine. Nur bei falara.io.'
+                : 'Multiple automated QA agents will review every translation for quality assurance, regardless of engine. Only at falara.io.';
+        },
+
+        qaBoxStyle() {
+            return {
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '12px',
+                background: '#eff6ff',
+                border: '1px solid #bfdbfe',
+                borderRadius: '8px',
+                padding: '16px',
+                marginBottom: '16px',
+            };
+        },
+
+        qaIconWrapStyle() {
+            return {
+                flexShrink: '0',
+                marginTop: '1px',
+            };
+        },
+
+        qaTextWrapStyle() {
+            return {
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '4px',
+            };
+        },
+
+        qaTitleStyle() {
+            return {
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#1e40af',
+                fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
+            };
+        },
+
+        qaDescStyle() {
+            return {
+                fontSize: '13px',
+                color: '#3b82f6',
+                lineHeight: '1.5',
+                fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
+            };
+        },
+
+        nativeSelectLabelStyle() {
+            return {
+                display: 'block',
+                fontSize: '13px',
+                fontWeight: '500',
+                color: '#374151',
+                marginBottom: '6px',
+                fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
+            };
+        },
+
+        nativeSelectStyle() {
+            return {
+                display: 'block',
+                width: '100%',
+                padding: '8px 12px',
+                fontSize: '14px',
+                color: '#374151',
+                background: '#ffffff',
+                border: '1px solid #d1d5db',
+                borderRadius: '6px',
+                appearance: 'auto',
+                fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
+            };
+        },
+
         subTabs() {
             return [
                 { key: 'connection', label: 'Connection' },

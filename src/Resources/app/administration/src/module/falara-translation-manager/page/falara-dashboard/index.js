@@ -5,96 +5,98 @@ Component.register('falara-dashboard', {
         <div class="falara-dashboard">
             <falara-nav-tabs />
 
-            <mt-loader v-if="isLoading" />
+            <div :style="{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }">
+                <mt-loader v-if="isLoading" />
 
-            <div v-else-if="!isConnected" :style="cardStyle">
-                <h2 :style="{ fontSize: '20px', fontWeight: '600', color: '#1a1a2e', marginBottom: '8px' }">
-                    {{ $t('falara-translation-manager.dashboard.notConnected') }}
-                </h2>
-                <p :style="{ color: '#6b7280', marginBottom: '20px' }">
-                    {{ $t('falara-translation-manager.dashboard.notConnectedMessage') }}
-                </p>
-                <mt-button variant="primary" @click="goToSettings">
-                    {{ $t('falara-translation-manager.dashboard.connectNow') }}
-                </mt-button>
-            </div>
-
-            <div v-else>
-
-                <!-- Quota Card -->
-                <div :style="cardStyle">
-                    <div :style="{ marginBottom: '16px' }">
-                        <span :style="{ fontSize: '11px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em' }">
-                            {{ $t('falara-translation-manager.dashboard.quota') }}
-                        </span>
-                        <span v-if="usage && usage.plan" :style="{ marginLeft: '8px', fontSize: '11px', background: '#e0e7ff', color: '#3730a3', borderRadius: '4px', padding: '2px 8px', fontWeight: '600' }">
-                            {{ usage.plan }}
-                        </span>
-                    </div>
-                    <falara-quota-widget v-if="usage" :usage="usage" />
-                </div>
-
-                <!-- Stats Grid -->
-                <div :style="{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }">
-                    <div :style="statCardStyle">
-                        <span :style="statValueStyle">{{ stats.total }}</span>
-                        <span :style="statLabelStyle">{{ $t('falara-translation-manager.dashboard.stats.totalJobs') }}</span>
-                    </div>
-                    <div :style="statCardStyle">
-                        <span :style="{ ...statValueStyle, color: '#16a34a' }">{{ stats.completed }}</span>
-                        <span :style="statLabelStyle">{{ $t('falara-translation-manager.dashboard.stats.completedJobs') }}</span>
-                    </div>
-                    <div :style="statCardStyle">
-                        <span :style="{ ...statValueStyle, color: '#dc2626' }">{{ stats.failed }}</span>
-                        <span :style="statLabelStyle">{{ $t('falara-translation-manager.dashboard.stats.failedJobs') }}</span>
-                    </div>
-                    <div :style="statCardStyle">
-                        <span :style="{ ...statValueStyle, color: '#d97706' }">{{ stats.pending }}</span>
-                        <span :style="statLabelStyle">{{ $t('falara-translation-manager.dashboard.stats.pendingJobs') }}</span>
-                    </div>
-                </div>
-
-                <!-- Recent Jobs -->
-                <div :style="cardStyle">
-                    <div :style="{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }">
-                        <span :style="{ fontSize: '15px', fontWeight: '600', color: '#1a1a2e' }">
-                            {{ $t('falara-translation-manager.dashboard.recentJobs') }}
-                        </span>
-                        <mt-button variant="ghost" size="small" @click="goToJobs">
-                            {{ $t('falara-translation-manager.dashboard.viewAllJobs') }}
-                        </mt-button>
-                    </div>
-
-                    <table v-if="recentJobs.length > 0" :style="tableStyle">
-                        <thead>
-                            <tr>
-                                <th :style="thStyle">{{ $t('falara-translation-manager.jobs.type') }}</th>
-                                <th :style="thStyle">{{ $t('falara-translation-manager.jobs.status') }}</th>
-                                <th :style="thStyle">{{ $t('falara-translation-manager.jobs.targetLanguage') }}</th>
-                                <th :style="thStyle">{{ $t('falara-translation-manager.jobs.createdAt') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr
-                                v-for="(job, idx) in recentJobs"
-                                :key="job.id"
-                                :style="idx % 2 === 0 ? tdRowEvenStyle : tdRowOddStyle"
-                                @click="goToJob(job.id)"
-                                @mouseenter="$event.currentTarget.style.background = '#f0f4ff'; $event.currentTarget.style.cursor = 'pointer'"
-                                @mouseleave="$event.currentTarget.style.background = idx % 2 === 0 ? '#ffffff' : '#f9fafb'; $event.currentTarget.style.cursor = 'default'"
-                            >
-                                <td :style="tdStyle">{{ job.contentType }}</td>
-                                <td :style="tdStyle"><falara-status-badge :status="job.status" /></td>
-                                <td :style="tdStyle">{{ job.targetLanguage }}</td>
-                                <td :style="tdStyle">{{ formatDate(job.createdAt) }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <p v-else :style="{ color: '#6b7280', fontSize: '14px' }">
-                        {{ $t('falara-translation-manager.jobs.noJobs') }}
+                <div v-else-if="!isConnected" :style="cardStyle">
+                    <h2 :style="{ fontSize: '20px', fontWeight: '600', color: '#1a1a2e', marginBottom: '8px' }">
+                        {{ $t('falara-translation-manager.dashboard.notConnected') }}
+                    </h2>
+                    <p :style="{ color: '#6b7280', marginBottom: '20px' }">
+                        {{ $t('falara-translation-manager.dashboard.notConnectedMessage') }}
                     </p>
+                    <mt-button variant="primary" @click="goToSettings">
+                        {{ $t('falara-translation-manager.dashboard.connectNow') }}
+                    </mt-button>
                 </div>
 
+                <div v-else>
+
+                    <!-- Quota Card -->
+                    <div :style="cardStyle">
+                        <div :style="{ marginBottom: '16px' }">
+                            <span :style="{ fontSize: '11px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em' }">
+                                {{ $t('falara-translation-manager.dashboard.quota') }}
+                            </span>
+                            <span v-if="usage && usage.plan" :style="{ marginLeft: '8px', fontSize: '11px', background: '#e0e7ff', color: '#3730a3', borderRadius: '4px', padding: '2px 8px', fontWeight: '600' }">
+                                {{ usage.plan }}
+                            </span>
+                        </div>
+                        <falara-quota-widget v-if="usage" :usage="usage" />
+                    </div>
+
+                    <!-- Stats Grid -->
+                    <div :style="{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }">
+                        <div :style="statCardStyle">
+                            <span :style="statValueStyle">{{ stats.total }}</span>
+                            <span :style="statLabelStyle">{{ $t('falara-translation-manager.dashboard.stats.totalJobs') }}</span>
+                        </div>
+                        <div :style="statCardStyle">
+                            <span :style="{ ...statValueStyle, color: '#16a34a' }">{{ stats.completed }}</span>
+                            <span :style="statLabelStyle">{{ $t('falara-translation-manager.dashboard.stats.completedJobs') }}</span>
+                        </div>
+                        <div :style="statCardStyle">
+                            <span :style="{ ...statValueStyle, color: '#dc2626' }">{{ stats.failed }}</span>
+                            <span :style="statLabelStyle">{{ $t('falara-translation-manager.dashboard.stats.failedJobs') }}</span>
+                        </div>
+                        <div :style="statCardStyle">
+                            <span :style="{ ...statValueStyle, color: '#d97706' }">{{ stats.pending }}</span>
+                            <span :style="statLabelStyle">{{ $t('falara-translation-manager.dashboard.stats.pendingJobs') }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Recent Jobs -->
+                    <div :style="cardStyle">
+                        <div :style="{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }">
+                            <span :style="{ fontSize: '15px', fontWeight: '600', color: '#1a1a2e' }">
+                                {{ $t('falara-translation-manager.dashboard.recentJobs') }}
+                            </span>
+                            <mt-button variant="ghost" size="small" @click="goToJobs">
+                                {{ $t('falara-translation-manager.dashboard.viewAllJobs') }}
+                            </mt-button>
+                        </div>
+
+                        <table v-if="recentJobs.length > 0" :style="tableStyle">
+                            <thead>
+                                <tr>
+                                    <th :style="thStyle">{{ $t('falara-translation-manager.jobs.type') }}</th>
+                                    <th :style="thStyle">{{ $t('falara-translation-manager.jobs.status') }}</th>
+                                    <th :style="thStyle">{{ $t('falara-translation-manager.jobs.targetLanguage') }}</th>
+                                    <th :style="thStyle">{{ $t('falara-translation-manager.jobs.createdAt') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                    v-for="(job, idx) in recentJobs"
+                                    :key="job.id"
+                                    :style="idx % 2 === 0 ? tdRowEvenStyle : tdRowOddStyle"
+                                    @click="goToJob(job.id)"
+                                    @mouseenter="$event.currentTarget.style.background = '#f0f4ff'; $event.currentTarget.style.cursor = 'pointer'"
+                                    @mouseleave="$event.currentTarget.style.background = idx % 2 === 0 ? '#ffffff' : '#f9fafb'; $event.currentTarget.style.cursor = 'default'"
+                                >
+                                    <td :style="tdStyle">{{ job.contentType }}</td>
+                                    <td :style="tdStyle"><falara-status-badge :status="job.status" /></td>
+                                    <td :style="tdStyle">{{ job.targetLanguage }}</td>
+                                    <td :style="tdStyle">{{ formatDate(job.createdAt) }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p v-else :style="{ color: '#6b7280', fontSize: '14px' }">
+                            {{ $t('falara-translation-manager.jobs.noJobs') }}
+                        </p>
+                    </div>
+
+                </div>
             </div>
         </div>
     `,

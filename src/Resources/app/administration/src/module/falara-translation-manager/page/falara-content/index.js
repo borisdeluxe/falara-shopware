@@ -5,103 +5,105 @@ Component.register('falara-content', {
         <div class="falara-content">
             <falara-nav-tabs />
 
-            <mt-loader v-if="isLoading" />
+            <div :style="{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }">
+                <mt-loader v-if="isLoading" />
 
-            <div v-else>
+                <div v-else>
 
-                <!-- Custom Tab Bar -->
-                <div :style="tabBarStyle">
-                    <button
-                        v-for="tab in tabItems"
-                        :key="tab.name"
-                        :style="activeTab === tab.name ? activeTabBtnStyle : tabBtnStyle"
-                        @click="onTabChange(tab.name)"
-                        @mouseenter="hoverTab = tab.name"
-                        @mouseleave="hoverTab = null"
-                    >
-                        {{ tab.label }}
-                    </button>
-                </div>
-
-                <!-- Toolbar -->
-                <div :style="{ display: 'flex', alignItems: 'flex-end', gap: '12px', marginBottom: '16px' }">
-                    <div :style="{ flex: 1 }">
-                        <mt-text-field
-                            :label="$t('falara-translation-manager.content.search')"
-                            v-model="searchTerm"
-                            @change="onSearch"
-                        />
+                    <!-- Custom Tab Bar -->
+                    <div :style="tabBarStyle">
+                        <button
+                            v-for="tab in tabItems"
+                            :key="tab.name"
+                            :style="activeTab === tab.name ? activeTabBtnStyle : tabBtnStyle"
+                            @click="onTabChange(tab.name)"
+                            @mouseenter="hoverTab = tab.name"
+                            @mouseleave="hoverTab = null"
+                        >
+                            {{ tab.label }}
+                        </button>
                     </div>
-                    <mt-button
-                        variant="primary"
-                        :disabled="selectedItems.length === 0"
-                        @click="openTranslateModal"
-                    >
-                        {{ $t('falara-translation-manager.content.translateSelected') }}
-                        <span v-if="selectedItems.length > 0">&nbsp;({{ selectedItems.length }})</span>
-                    </mt-button>
+
+                    <!-- Toolbar -->
+                    <div :style="{ display: 'flex', alignItems: 'flex-end', gap: '12px', marginBottom: '16px' }">
+                        <div :style="{ flex: 1 }">
+                            <mt-text-field
+                                :label="$t('falara-translation-manager.content.search')"
+                                v-model="searchTerm"
+                                @change="onSearch"
+                            />
+                        </div>
+                        <mt-button
+                            variant="primary"
+                            :disabled="selectedItems.length === 0"
+                            @click="openTranslateModal"
+                        >
+                            {{ $t('falara-translation-manager.content.translateSelected') }}
+                            <span v-if="selectedItems.length > 0">&nbsp;({{ selectedItems.length }})</span>
+                        </mt-button>
+                    </div>
+
+                    <!-- Table -->
+                    <div :style="tableWrapStyle">
+                        <table v-if="items.length > 0" :style="tableStyle">
+                            <thead>
+                                <tr>
+                                    <th :style="{ ...thStyle, width: '40px' }">
+                                        <mt-checkbox
+                                            :checked="allSelected"
+                                            @change="toggleAll"
+                                        />
+                                    </th>
+                                    <th :style="thStyle">{{ $t('falara-translation-manager.content.name') }}</th>
+                                    <th :style="thStyle">{{ $t('falara-translation-manager.content.type') }}</th>
+                                    <th :style="thStyle">{{ $t('falara-translation-manager.content.lastTranslated') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                    v-for="(item, idx) in items"
+                                    :key="item.id"
+                                    :style="idx % 2 === 0 ? tdRowEvenStyle : tdRowOddStyle"
+                                >
+                                    <td :style="tdStyle">
+                                        <mt-checkbox
+                                            :checked="selectedItems.includes(item.id)"
+                                            @change="toggleItem(item.id)"
+                                        />
+                                    </td>
+                                    <td :style="tdStyle">{{ item.name }}</td>
+                                    <td :style="tdStyle">{{ item.type }}</td>
+                                    <td :style="tdStyle">{{ item.lastTranslated ? formatDate(item.lastTranslated) : '-' }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p v-else :style="{ padding: '32px', textAlign: 'center', color: '#6b7280', fontSize: '14px' }">
+                            {{ $t('falara-translation-manager.general.noData') }}
+                        </p>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div v-if="totalPages > 1" :style="{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginTop: '20px' }">
+                        <mt-button variant="ghost" :disabled="currentPage <= 1" @click="prevPage">«</mt-button>
+                        <span :style="{ fontSize: '14px', color: '#374151', fontWeight: '500' }">{{ currentPage }} / {{ totalPages }}</span>
+                        <mt-button variant="ghost" :disabled="currentPage >= totalPages" @click="nextPage">»</mt-button>
+                    </div>
+
                 </div>
 
-                <!-- Table -->
-                <div :style="tableWrapStyle">
-                    <table v-if="items.length > 0" :style="tableStyle">
-                        <thead>
-                            <tr>
-                                <th :style="{ ...thStyle, width: '40px' }">
-                                    <mt-checkbox
-                                        :checked="allSelected"
-                                        @change="toggleAll"
-                                    />
-                                </th>
-                                <th :style="thStyle">{{ $t('falara-translation-manager.content.name') }}</th>
-                                <th :style="thStyle">{{ $t('falara-translation-manager.content.type') }}</th>
-                                <th :style="thStyle">{{ $t('falara-translation-manager.content.lastTranslated') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr
-                                v-for="(item, idx) in items"
-                                :key="item.id"
-                                :style="idx % 2 === 0 ? tdRowEvenStyle : tdRowOddStyle"
-                            >
-                                <td :style="tdStyle">
-                                    <mt-checkbox
-                                        :checked="selectedItems.includes(item.id)"
-                                        @change="toggleItem(item.id)"
-                                    />
-                                </td>
-                                <td :style="tdStyle">{{ item.name }}</td>
-                                <td :style="tdStyle">{{ item.type }}</td>
-                                <td :style="tdStyle">{{ item.lastTranslated ? formatDate(item.lastTranslated) : '-' }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <p v-else :style="{ padding: '32px', textAlign: 'center', color: '#6b7280', fontSize: '14px' }">
-                        {{ $t('falara-translation-manager.general.noData') }}
-                    </p>
-                </div>
-
-                <!-- Pagination -->
-                <div v-if="totalPages > 1" :style="{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginTop: '20px' }">
-                    <mt-button variant="ghost" :disabled="currentPage <= 1" @click="prevPage">«</mt-button>
-                    <span :style="{ fontSize: '14px', color: '#374151', fontWeight: '500' }">{{ currentPage }} / {{ totalPages }}</span>
-                    <mt-button variant="ghost" :disabled="currentPage >= totalPages" @click="nextPage">»</mt-button>
-                </div>
-
-            </div>
-
-            <!-- Translate Modal -->
-            <div v-if="showTranslateModal" :style="modalOverlayStyle">
-                <div :style="modalStyle">
-                    <mt-card :title="$t('falara-translation-manager.modal.title')">
-                        <falara-translate-modal
-                            :items="selectedItemObjects"
-                            :sales-channel-id="salesChannelId"
-                            :defaults="translationDefaults"
-                            @translate="onTranslate"
-                            @cancel="showTranslateModal = false"
-                        />
-                    </mt-card>
+                <!-- Translate Modal -->
+                <div v-if="showTranslateModal" :style="modalOverlayStyle">
+                    <div :style="modalStyle">
+                        <mt-card :title="$t('falara-translation-manager.modal.title')">
+                            <falara-translate-modal
+                                :items="selectedItemObjects"
+                                :sales-channel-id="salesChannelId"
+                                :defaults="translationDefaults"
+                                @translate="onTranslate"
+                                @cancel="showTranslateModal = false"
+                            />
+                        </mt-card>
+                    </div>
                 </div>
             </div>
         </div>

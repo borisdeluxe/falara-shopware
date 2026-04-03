@@ -4,82 +4,84 @@ Component.register('falara-job-detail', {
     template: `
         <div class="falara-job-detail">
             <falara-nav-tabs />
-            <mt-card :title="$t('falara-translation-manager.jobDetail.title')">
-                <mt-button variant="ghost" @click="goBack" class="falara-job-detail__back">
-                    ← {{ $t('falara-translation-manager.jobDetail.back') }}
-                </mt-button>
+            <div :style="{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }">
+                <mt-card :title="$t('falara-translation-manager.jobDetail.title')">
+                    <mt-button variant="ghost" @click="goBack" class="falara-job-detail__back">
+                        ← {{ $t('falara-translation-manager.jobDetail.back') }}
+                    </mt-button>
 
-                <mt-loader v-if="isLoading" />
+                    <mt-loader v-if="isLoading" />
 
-                <div v-else-if="job">
-                    <div
-                        v-if="isZombie"
-                        class="falara-job-detail__zombie-warning"
-                    >
-                        ⚠ {{ $t('falara-translation-manager.jobDetail.zombieWarning') }}
-                    </div>
+                    <div v-else-if="job">
+                        <div
+                            v-if="isZombie"
+                            class="falara-job-detail__zombie-warning"
+                        >
+                            ⚠ {{ $t('falara-translation-manager.jobDetail.zombieWarning') }}
+                        </div>
 
-                    <div class="falara-job-detail__status-banner" :class="statusBannerClass">
-                        <falara-status-badge :status="job.status" />
-                    </div>
+                        <div class="falara-job-detail__status-banner" :class="statusBannerClass">
+                            <falara-status-badge :status="job.status" />
+                        </div>
 
-                    <div class="falara-job-detail__info">
-                        <div class="falara-job-detail__info-row">
-                            <span class="falara-job-detail__label">{{ $t('falara-translation-manager.jobDetail.sourceLanguage') }}</span>
-                            <span>{{ job.sourceLanguage }}</span>
+                        <div class="falara-job-detail__info">
+                            <div class="falara-job-detail__info-row">
+                                <span class="falara-job-detail__label">{{ $t('falara-translation-manager.jobDetail.sourceLanguage') }}</span>
+                                <span>{{ job.sourceLanguage }}</span>
+                            </div>
+                            <div class="falara-job-detail__info-row">
+                                <span class="falara-job-detail__label">{{ $t('falara-translation-manager.jobDetail.targetLanguage') }}</span>
+                                <span>{{ job.targetLanguage }}</span>
+                            </div>
+                            <div class="falara-job-detail__info-row">
+                                <span class="falara-job-detail__label">{{ $t('falara-translation-manager.jobDetail.itemCount') }}</span>
+                                <span>{{ job.itemCount }}</span>
+                            </div>
+                            <div class="falara-job-detail__info-row" v-if="job.wordCount">
+                                <span class="falara-job-detail__label">{{ $t('falara-translation-manager.jobDetail.wordCount') }}</span>
+                                <span>{{ job.wordCount }}</span>
+                            </div>
+                            <div class="falara-job-detail__info-row">
+                                <span class="falara-job-detail__label">{{ $t('falara-translation-manager.jobDetail.createdAt') }}</span>
+                                <span>{{ formatDate(job.createdAt) }}</span>
+                            </div>
+                            <div class="falara-job-detail__info-row" v-if="job.completedAt">
+                                <span class="falara-job-detail__label">{{ $t('falara-translation-manager.jobDetail.completedAt') }}</span>
+                                <span>{{ formatDate(job.completedAt) }}</span>
+                            </div>
                         </div>
-                        <div class="falara-job-detail__info-row">
-                            <span class="falara-job-detail__label">{{ $t('falara-translation-manager.jobDetail.targetLanguage') }}</span>
-                            <span>{{ job.targetLanguage }}</span>
-                        </div>
-                        <div class="falara-job-detail__info-row">
-                            <span class="falara-job-detail__label">{{ $t('falara-translation-manager.jobDetail.itemCount') }}</span>
-                            <span>{{ job.itemCount }}</span>
-                        </div>
-                        <div class="falara-job-detail__info-row" v-if="job.wordCount">
-                            <span class="falara-job-detail__label">{{ $t('falara-translation-manager.jobDetail.wordCount') }}</span>
-                            <span>{{ job.wordCount }}</span>
-                        </div>
-                        <div class="falara-job-detail__info-row">
-                            <span class="falara-job-detail__label">{{ $t('falara-translation-manager.jobDetail.createdAt') }}</span>
-                            <span>{{ formatDate(job.createdAt) }}</span>
-                        </div>
-                        <div class="falara-job-detail__info-row" v-if="job.completedAt">
-                            <span class="falara-job-detail__label">{{ $t('falara-translation-manager.jobDetail.completedAt') }}</span>
-                            <span>{{ formatDate(job.completedAt) }}</span>
-                        </div>
-                    </div>
 
-                    <div class="falara-job-detail__actions" v-if="job.status === 'writeback_failed'">
-                        <mt-button variant="primary" @click="retryWriteBack" :disabled="isRetrying">
-                            {{ isRetrying ? $t('falara-translation-manager.general.loading') : $t('falara-translation-manager.jobDetail.retryWriteBack') }}
-                        </mt-button>
-                    </div>
-
-                    <div class="falara-job-detail__errors" v-if="hasWriteBackErrors">
-                        <div class="falara-job-detail__errors-header">
-                            <h3>{{ $t('falara-translation-manager.jobDetail.writeBackErrors') }}</h3>
-                            <mt-button variant="ghost" size="small" @click="showErrors = !showErrors">
-                                {{ showErrors ? $t('falara-translation-manager.jobDetail.collapseErrors') : $t('falara-translation-manager.jobDetail.expandErrors') }}
+                        <div class="falara-job-detail__actions" v-if="job.status === 'writeback_failed'">
+                            <mt-button variant="primary" @click="retryWriteBack" :disabled="isRetrying">
+                                {{ isRetrying ? $t('falara-translation-manager.general.loading') : $t('falara-translation-manager.jobDetail.retryWriteBack') }}
                             </mt-button>
                         </div>
-                        <div v-if="showErrors" class="falara-job-detail__errors-list">
-                            <div
-                                v-for="(error, idx) in job.writeBackErrors"
-                                :key="idx"
-                                class="falara-job-detail__error-item"
-                            >
-                                <span class="falara-job-detail__error-field">{{ error.field || error.entityId }}</span>
-                                <span class="falara-job-detail__error-message">{{ error.message }}</span>
+
+                        <div class="falara-job-detail__errors" v-if="hasWriteBackErrors">
+                            <div class="falara-job-detail__errors-header">
+                                <h3>{{ $t('falara-translation-manager.jobDetail.writeBackErrors') }}</h3>
+                                <mt-button variant="ghost" size="small" @click="showErrors = !showErrors">
+                                    {{ showErrors ? $t('falara-translation-manager.jobDetail.collapseErrors') : $t('falara-translation-manager.jobDetail.expandErrors') }}
+                                </mt-button>
+                            </div>
+                            <div v-if="showErrors" class="falara-job-detail__errors-list">
+                                <div
+                                    v-for="(error, idx) in job.writeBackErrors"
+                                    :key="idx"
+                                    class="falara-job-detail__error-item"
+                                >
+                                    <span class="falara-job-detail__error-field">{{ error.field || error.entityId }}</span>
+                                    <span class="falara-job-detail__error-message">{{ error.message }}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div v-else>
-                    <p>{{ $t('falara-translation-manager.general.noData') }}</p>
-                </div>
-            </mt-card>
+                    <div v-else>
+                        <p>{{ $t('falara-translation-manager.general.noData') }}</p>
+                    </div>
+                </mt-card>
+            </div>
         </div>
     `,
 

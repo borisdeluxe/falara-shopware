@@ -4,69 +4,71 @@ Component.register('falara-jobs', {
     template: `
         <div class="falara-jobs">
             <falara-nav-tabs />
-            <mt-card :title="$t('falara-translation-manager.jobs.title')">
-                <div class="falara-jobs__toolbar">
-                    <mt-switch
-                        :label="$t('falara-translation-manager.jobs.showArchived')"
-                        v-model="showArchived"
-                        @change="loadJobs"
-                    />
-                    <span class="falara-jobs__auto-refresh">{{ $t('falara-translation-manager.jobs.autoRefresh') }}</span>
-                </div>
-
-                <mt-loader v-if="isLoading" />
-
-                <div v-else>
-                    <div v-if="jobs.length === 0">
-                        <p>{{ $t('falara-translation-manager.jobs.noJobs') }}</p>
+            <div :style="{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }">
+                <mt-card :title="$t('falara-translation-manager.jobs.title')">
+                    <div class="falara-jobs__toolbar">
+                        <mt-switch
+                            :label="$t('falara-translation-manager.jobs.showArchived')"
+                            v-model="showArchived"
+                            @change="loadJobs"
+                        />
+                        <span class="falara-jobs__auto-refresh">{{ $t('falara-translation-manager.jobs.autoRefresh') }}</span>
                     </div>
+
+                    <mt-loader v-if="isLoading" />
 
                     <div v-else>
-                        <div v-for="(batchJobs, batchId) in groupedJobs" :key="batchId" class="falara-jobs__batch">
-                            <div class="falara-jobs__batch-header">
-                                <strong>{{ $t('falara-translation-manager.jobs.batchLabel') }}: {{ batchId }}</strong>
-                                <span class="falara-jobs__batch-count">({{ batchJobs.length }})</span>
+                        <div v-if="jobs.length === 0">
+                            <p>{{ $t('falara-translation-manager.jobs.noJobs') }}</p>
+                        </div>
+
+                        <div v-else>
+                            <div v-for="(batchJobs, batchId) in groupedJobs" :key="batchId" class="falara-jobs__batch">
+                                <div class="falara-jobs__batch-header">
+                                    <strong>{{ $t('falara-translation-manager.jobs.batchLabel') }}: {{ batchId }}</strong>
+                                    <span class="falara-jobs__batch-count">({{ batchJobs.length }})</span>
+                                </div>
+                                <table class="falara-jobs__table">
+                                    <thead>
+                                        <tr>
+                                            <th>{{ $t('falara-translation-manager.jobs.type') }}</th>
+                                            <th>{{ $t('falara-translation-manager.jobs.status') }}</th>
+                                            <th>{{ $t('falara-translation-manager.jobs.sourceLanguage') }}</th>
+                                            <th>{{ $t('falara-translation-manager.jobs.targetLanguage') }}</th>
+                                            <th>{{ $t('falara-translation-manager.jobs.itemCount') }}</th>
+                                            <th>{{ $t('falara-translation-manager.jobs.createdAt') }}</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="job in batchJobs" :key="job.id" class="falara-jobs__row">
+                                            <td>{{ job.contentType }}</td>
+                                            <td><falara-status-badge :status="job.status" /></td>
+                                            <td>{{ job.sourceLanguage }}</td>
+                                            <td>{{ job.targetLanguage }}</td>
+                                            <td>{{ job.itemCount }}</td>
+                                            <td>{{ formatDate(job.createdAt) }}</td>
+                                            <td class="falara-jobs__actions">
+                                                <mt-button variant="ghost" size="small" @click="viewJob(job.id)">
+                                                    {{ $t('falara-translation-manager.jobs.viewDetail') }}
+                                                </mt-button>
+                                                <mt-button
+                                                    v-if="!job.archived"
+                                                    variant="ghost"
+                                                    size="small"
+                                                    @click="archiveJob(job.id)"
+                                                >
+                                                    {{ $t('falara-translation-manager.jobs.archive') }}
+                                                </mt-button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
-                            <table class="falara-jobs__table">
-                                <thead>
-                                    <tr>
-                                        <th>{{ $t('falara-translation-manager.jobs.type') }}</th>
-                                        <th>{{ $t('falara-translation-manager.jobs.status') }}</th>
-                                        <th>{{ $t('falara-translation-manager.jobs.sourceLanguage') }}</th>
-                                        <th>{{ $t('falara-translation-manager.jobs.targetLanguage') }}</th>
-                                        <th>{{ $t('falara-translation-manager.jobs.itemCount') }}</th>
-                                        <th>{{ $t('falara-translation-manager.jobs.createdAt') }}</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="job in batchJobs" :key="job.id" class="falara-jobs__row">
-                                        <td>{{ job.contentType }}</td>
-                                        <td><falara-status-badge :status="job.status" /></td>
-                                        <td>{{ job.sourceLanguage }}</td>
-                                        <td>{{ job.targetLanguage }}</td>
-                                        <td>{{ job.itemCount }}</td>
-                                        <td>{{ formatDate(job.createdAt) }}</td>
-                                        <td class="falara-jobs__actions">
-                                            <mt-button variant="ghost" size="small" @click="viewJob(job.id)">
-                                                {{ $t('falara-translation-manager.jobs.viewDetail') }}
-                                            </mt-button>
-                                            <mt-button
-                                                v-if="!job.archived"
-                                                variant="ghost"
-                                                size="small"
-                                                @click="archiveJob(job.id)"
-                                            >
-                                                {{ $t('falara-translation-manager.jobs.archive') }}
-                                            </mt-button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
                         </div>
                     </div>
-                </div>
-            </mt-card>
+                </mt-card>
+            </div>
         </div>
     `,
 
