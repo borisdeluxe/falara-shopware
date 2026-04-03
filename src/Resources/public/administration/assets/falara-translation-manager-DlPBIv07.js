@@ -573,43 +573,63 @@ const{Application:f}=Shopware;class v{constructor(t,e){this.httpClient=t,this.lo
         </div>
     `,emits:["translate","cancel"],props:{items:{type:Array,required:!0,default:()=>[]},salesChannelId:{type:String,required:!0},defaults:{type:Object,default:()=>({})}},data(){return{selectedLanguages:[],selectedGlossary:null,showAdvanced:!1,availableLanguages:[],glossaries:[],form:{domain:"",tone:"",quality:"standard",instructions:""}}},computed:{glossaryOptions(){return[{value:null,label:this.$t("falara-translation-manager.modal.noGlossary")}].concat(this.glossaries.map(t=>({value:t.id,label:t.name})))},qualityOptions(){return[{value:"draft",label:"Draft"},{value:"standard",label:"Standard"},{value:"premium",label:"Premium"}]}},created(){this.loadLanguages(),this.loadGlossaries(),this.applyDefaults()},methods:{applyDefaults(){this.defaults&&(this.form.domain=this.defaults.domain||"",this.form.tone=this.defaults.tone||"",this.form.quality=this.defaults.quality||"standard",this.form.instructions=this.defaults.instructions||"",this.defaults.targetLanguages&&(this.selectedLanguages=[...this.defaults.targetLanguages]),this.defaults.glossaryId&&(this.selectedGlossary=this.defaults.glossaryId))},loadLanguages(){Shopware.Service("repositoryFactory").create("language").search(Shopware.Data.Criteria.fromCriteria({associations:["locale"]}),Shopware.Context.api).then(t=>{this.availableLanguages=t.map(e=>({id:e.id,name:e.name}))}).catch(()=>{this.availableLanguages=[]})},loadGlossaries(){Shopware.Service("falaraApiService").getGlossaries(this.salesChannelId).then(t=>{this.glossaries=t.data||[]}).catch(()=>{this.glossaries=[]})},toggleLanguage(a){const t=this.selectedLanguages.indexOf(a);t>-1?this.selectedLanguages.splice(t,1):this.selectedLanguages.push(a)},onTranslate(){this.selectedLanguages.length!==0&&this.$emit("translate",{items:this.items,salesChannelId:this.salesChannelId,targetLanguages:this.selectedLanguages,glossaryId:this.selectedGlossary,...this.form})}}});const{Component:L}=Shopware;L.register("falara-nav-tabs",{template:`
         <div class="falara-nav-tabs">
-            <button
-                v-for="tab in tabs"
-                :key="tab.route"
-                class="falara-nav-tabs__tab"
-                :class="{ 'falara-nav-tabs__tab--active': isActive(tab.route) }"
-                @click="navigate(tab.route)"
-            >
-                {{ $t(tab.label) }}
-            </button>
+            <div class="falara-nav-tabs__header">
+                <h1 class="falara-nav-tabs__title">Falara Translation Manager</h1>
+            </div>
+            <nav class="falara-nav-tabs__bar">
+                <button
+                    v-for="tab in tabs"
+                    :key="tab.route"
+                    class="falara-nav-tabs__tab"
+                    :class="{ 'falara-nav-tabs__tab--active': isActive(tab.route) }"
+                    @click="navigate(tab.route)"
+                >
+                    {{ $t(tab.label) }}
+                </button>
+            </nav>
             <style>
                 .falara-nav-tabs {
+                    background: #fff;
+                    border-bottom: 1px solid #d1d5db;
+                    margin: -24px -24px 24px -24px;
+                    padding: 0;
+                }
+                .falara-nav-tabs__header {
+                    padding: 20px 32px 0 32px;
+                }
+                .falara-nav-tabs__title {
+                    font-size: 24px;
+                    font-weight: 700;
+                    color: #1a1a2e;
+                    margin: 0 0 16px 0;
+                }
+                .falara-nav-tabs__bar {
                     display: flex;
-                    flex-direction: row;
-                    border-bottom: 2px solid #e0e0e0;
-                    margin-bottom: 20px;
                     gap: 0;
+                    padding: 0 32px;
                 }
                 .falara-nav-tabs__tab {
                     background: none;
                     border: none;
                     border-bottom: 3px solid transparent;
-                    margin-bottom: -2px;
-                    padding: 10px 20px;
+                    padding: 12px 20px;
                     cursor: pointer;
                     font-size: 14px;
                     font-weight: 500;
                     color: #6b7280;
-                    transition: color 0.2s, border-color 0.2s;
+                    transition: all 0.15s ease;
+                    white-space: nowrap;
                 }
                 .falara-nav-tabs__tab:hover {
                     color: #1a73e8;
+                    background: #f0f4ff;
                 }
                 .falara-nav-tabs__tab--active {
                     color: #1a73e8;
                     border-bottom-color: #1a73e8;
+                    font-weight: 600;
                 }
             </style>
         </div>
-    `,computed:{tabs(){return[{route:"falara.translation.manager.dashboard",label:"falara-translation-manager.nav.dashboard"},{route:"falara.translation.manager.content",label:"falara-translation-manager.nav.content"},{route:"falara.translation.manager.jobs",label:"falara-translation-manager.nav.jobs"},{route:"falara.translation.manager.audit",label:"falara-translation-manager.nav.audit"},{route:"falara.translation.manager.settings",label:"falara-translation-manager.nav.settings"}]}},methods:{isActive(a){const t=this.$route.name;return t?t===a||a==="falara.translation.manager.jobs"&&t==="falara.translation.manager.job.detail":!1},navigate(a){this.isActive(a)||this.$router.push({name:a})}}});const{Module:P}=Shopware;P.register("falara-translation-manager",{type:"plugin",name:"falara-translation-manager.general.title",title:"falara-translation-manager.general.title",description:"falara-translation-manager.general.description",color:"#1a73e8",icon:"regular-language",snippets:{"de-DE":()=>u(()=>import("./de-DE-CTLn2U6y.js"),[]),"en-GB":()=>u(()=>import("./en-GB-Cpj3ozAp.js"),[])},routes:{dashboard:{component:"falara-dashboard",path:"dashboard"},content:{component:"falara-content",path:"content/:type?"},jobs:{component:"falara-jobs",path:"jobs"},"job-detail":{component:"falara-job-detail",path:"jobs/:id"},audit:{component:"falara-audit",path:"audit"},settings:{component:"falara-settings",path:"settings"}},navigation:[{label:"falara-translation-manager.general.title",color:"#1a73e8",icon:"regular-language",path:"falara.translation.manager.dashboard",parent:"sw-settings",position:100}]});
-//# sourceMappingURL=falara-translation-manager-BCigDB9e.js.map
+    `,computed:{tabs(){return[{route:"falara.translation.manager.dashboard",label:"falara-translation-manager.nav.dashboard"},{route:"falara.translation.manager.content",label:"falara-translation-manager.nav.content"},{route:"falara.translation.manager.jobs",label:"falara-translation-manager.nav.jobs"},{route:"falara.translation.manager.audit",label:"falara-translation-manager.nav.audit"},{route:"falara.translation.manager.settings",label:"falara-translation-manager.nav.settings"}]}},methods:{isActive(a){const t=this.$route.name;return t?t===a||a==="falara.translation.manager.jobs"&&t==="falara.translation.manager.job-detail":!1},navigate(a){this.isActive(a)||this.$router.push({name:a})}}});const{Module:P}=Shopware;P.register("falara-translation-manager",{type:"plugin",name:"falara-translation-manager.general.title",title:"falara-translation-manager.general.title",description:"falara-translation-manager.general.description",color:"#1a73e8",icon:"regular-language",snippets:{"de-DE":()=>u(()=>import("./de-DE-CTLn2U6y.js"),[]),"en-GB":()=>u(()=>import("./en-GB-Cpj3ozAp.js"),[])},routes:{dashboard:{component:"falara-dashboard",path:"dashboard"},content:{component:"falara-content",path:"content/:type?"},jobs:{component:"falara-jobs",path:"jobs"},"job-detail":{component:"falara-job-detail",path:"jobs/:id"},audit:{component:"falara-audit",path:"audit"},settings:{component:"falara-settings",path:"settings"}},navigation:[{label:"falara-translation-manager.general.title",color:"#1a73e8",icon:"regular-language",path:"falara.translation.manager.dashboard",parent:"sw-settings",position:100}]});
+//# sourceMappingURL=falara-translation-manager-DlPBIv07.js.map
