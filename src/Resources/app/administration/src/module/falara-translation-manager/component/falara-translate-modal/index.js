@@ -251,6 +251,7 @@ Component.register('falara-translate-modal', {
                 { id: 'fr', name: 'French (fr)', code: 'fr' },
                 { id: 'fr-BE', name: 'French - Belgium (fr-BE)', code: 'fr-BE' },
                 { id: 'fr-CH', name: 'French - Switzerland (fr-CH)', code: 'fr-CH' },
+                { id: 'fr-CA', name: 'French - Canada (fr-CA)', code: 'fr-CA' },
                 { id: 'es', name: 'Spanish (es)', code: 'es' },
                 { id: 'it', name: 'Italian (it)', code: 'it' },
                 { id: 'it-CH', name: 'Italian - Switzerland (it-CH)', code: 'it-CH' },
