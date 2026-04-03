@@ -1,0 +1,23 @@
+{% block falara_quota_widget %}
+<div class="falara-quota-widget">
+    <div class="falara-quota-widget__header">
+        <span class="falara-quota-widget__plan">
+            {{ $t('falara-translation-manager.quota.plan') }}: <strong>{{ usage.plan || '-' }}</strong>
+        </span>
+        <span class="falara-quota-widget__numbers">{{ usage.used || 0 }} / {{ usage.limit || 0 }}</span>
+    </div>
+    <mt-progress-bar
+        :value="progressValue"
+        :max="100"
+    />
+    <div v-if="isExceeded" class="falara-quota-widget__alert falara-quota-widget__alert--danger">
+        {{ $t('falara-translation-manager.quota.exceeded') }}
+    </div>
+    <div v-else-if="isWarning" class="falara-quota-widget__alert falara-quota-widget__alert--warning">
+        {{ $t('falara-translation-manager.quota.warningThreshold') }}
+    </div>
+    <div class="falara-quota-widget__remaining">
+        {{ $t('falara-translation-manager.quota.remaining') }}: {{ remaining }}
+    </div>
+</div>
+{% endblock %}

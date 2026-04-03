@@ -1,0 +1,138 @@
+{% block falara_settings %}
+<div class="falara-settings">
+    <mt-card :title="$t('falara-translation-manager.settings.title')">
+        <mt-tabs
+            :items="tabItems"
+            v-model="activeTab"
+            @change="onTabChange"
+        />
+
+        <mt-loader v-if="isLoading" />
+
+        <div v-else>
+            <!-- Connection Tab -->
+            <div v-show="activeTab === 'connection'" class="falara-settings__tab-content">
+                <h3>{{ $t('falara-translation-manager.settings.connection.title') }}</h3>
+
+                <div class="falara-settings__status">
+                    <span class="falara-settings__status-label">{{ $t('falara-translation-manager.settings.connection.status') }}:</span>
+                    <span v-if="isConnected" class="falara-settings__status--connected">
+                        {{ $t('falara-translation-manager.settings.connection.connected') }}
+                        <span v-if="connectionData.account">
+                            — {{ $t('falara-translation-manager.settings.connection.connectedAs', { account: connectionData.account }) }}
+                        </span>
+                    </span>
+                    <span v-else class="falara-settings__status--disconnected">
+                        {{ $t('falara-translation-manager.settings.connection.notConnected') }}
+                    </span>
+                </div>
+
+                <div v-if="!isConnected" class="falara-settings__connect-form">
+                    <mt-text-field
+                        :label="$t('falara-translation-manager.settings.connection.apiKey')"
+                        :placeholder="$t('falara-translation-manager.settings.connection.apiKeyPlaceholder')"
+                        v-model="connectForm.apiKey"
+                        type="password"
+                    />
+                    <mt-button
+                        variant="primary"
+                        :disabled="!connectForm.apiKey || isConnecting"
+                        @click="connect"
+                    >
+                        {{ isConnecting ? $t('falara-translation-manager.general.loading') : $t('falara-translation-manager.settings.connection.connect') }}
+                    </mt-button>
+                </div>
+
+                <div v-else class="falara-settings__disconnect">
+                    <mt-button
+                        variant="danger"
+                        :disabled="isDisconnecting"
+                        @click="confirmDisconnect"
+                    >
+                        {{ isDisconnecting ? $t('falara-translation-manager.general.loading') : $t('falara-translation-manager.settings.connection.disconnect') }}
+                    </mt-button>
+                </div>
+
+                <div v-if="showDisconnectConfirm" class="falara-settings__confirm-dialog">
+                    <p>{{ $t('falara-translation-manager.settings.connection.disconnectConfirm') }}</p>
+                    <mt-button variant="danger" @click="disconnect">{{ $t('falara-translation-manager.general.yes') }}</mt-button>
+                    <mt-button variant="ghost" @click="showDisconnectConfirm = false">{{ $t('falara-translation-manager.general.no') }}</mt-button>
+                </div>
+            </div>
+
+            <!-- Custom Fields Tab -->
+            <div v-show="activeTab === 'customFields'" class="falara-settings__tab-content">
+                <h3>{{ $t('falara-translation-manager.settings.customFields.title') }}</h3>
+                <p>{{ $t('falara-translation-manager.settings.customFields.description') }}</p>
+
+                <div class="falara-settings__custom-fields-form">
+                    <mt-text-field
+                        :label="$t('falara-translation-manager.settings.customFields.fieldName')"
+                        v-model="newFieldName"
+                    />
+                    <mt-button variant="primary" @click="addCustomField" :disabled="!newFieldName">
+                        {{ $t('falara-translation-manager.settings.customFields.addField') }}
+                    </mt-button>
+                </div>
+
+                <div v-if="customFields.length === 0" class="falara-settings__empty">
+                    <p>{{ $t('falara-translation-manager.settings.customFields.noFields') }}</p>
+                </div>
+                <ul v-else class="falara-settings__custom-fields-list">
+                    <li v-for="(field, idx) in customFields" :key="idx" class="falara-settings__custom-field-item">
+                        <span>{{ field }}</span>
+                        <mt-button variant="ghost" size="small" @click="removeCustomField(idx)">
+                            {{ $t('falara-translation-manager.settings.customFields.removeField') }}
+                        </mt-button>
+                    </li>
+                </ul>
+
+                <mt-button variant="primary" @click="saveCustomFields" :disabled="isSaving">
+                    {{ isSaving ? $t('falara-translation-manager.general.loading') : $t('falara-translation-manager.general.save') }}
+                </mt-button>
+            </div>
+
+            <!-- Defaults Tab -->
+            <div v-show="activeTab === 'defaults'" class="falara-settings__tab-content">
+                <h3>{{ $t('falara-translation-manager.settings.defaults.title') }}</h3>
+
+                <mt-text-field
+                    :label="$t('falara-translation-manager.settings.defaults.sourceLanguage')"
+                    v-model="defaults.sourceLanguage"
+                />
+
+                <mt-text-field
+                    :label="$t('falara-translation-manager.settings.defaults.domain')"
+                    v-model="defaults.domain"
+                />
+
+                <mt-text-field
+                    :label="$t('falara-translation-manager.settings.defaults.tone')"
+                    v-model="defaults.tone"
+                />
+
+                <mt-select
+                    :label="$t('falara-translation-manager.settings.defaults.quality')"
+                    v-model="defaults.quality"
+                    :options="qualityOptions"
+                />
+
+                <mt-select
+                    :label="$t('falara-translation-manager.settings.defaults.provider')"
+                    v-model="defaults.provider"
+                    :options="providerOptions"
+                />
+
+                <mt-textarea
+                    :label="$t('falara-translation-manager.settings.defaults.instructions')"
+                    v-model="defaults.instructions"
+                />
+
+                <mt-button variant="primary" @click="saveDefaults" :disabled="isSaving">
+                    {{ isSaving ? $t('falara-translation-manager.general.loading') : $t('falara-translation-manager.settings.defaults.save') }}
+                </mt-button>
+            </div>
+        </div>
+    </mt-card>
+</div>
+{% endblock %}

@@ -1,0 +1,193 @@
+{
+    "falara-translation-manager": {
+        "general": {
+            "title": "Falara Übersetzungs-Manager",
+            "description": "KI-gestützte Übersetzungen für Ihren Shopware-Store",
+            "save": "Speichern",
+            "cancel": "Abbrechen",
+            "confirm": "Bestätigen",
+            "loading": "Laden...",
+            "error": "Ein Fehler ist aufgetreten",
+            "success": "Erfolgreich gespeichert",
+            "noData": "Keine Daten verfügbar",
+            "yes": "Ja",
+            "no": "Nein"
+        },
+        "nav": {
+            "dashboard": "Dashboard",
+            "content": "Inhalte",
+            "jobs": "Aufträge",
+            "audit": "Audit",
+            "settings": "Einstellungen"
+        },
+        "status": {
+            "pending": "Ausstehend",
+            "queued": "In Warteschlange",
+            "processing": "In Bearbeitung",
+            "writing_back": "Wird zurückgeschrieben",
+            "completed": "Abgeschlossen",
+            "written_back": "Zurückgeschrieben",
+            "needs_review": "Überprüfung erforderlich",
+            "failed": "Fehlgeschlagen",
+            "dead": "Abgebrochen",
+            "writeback_failed": "Zurückschreiben fehlgeschlagen",
+            "pending_tooltip": "Auftrag wartet auf Bearbeitung",
+            "queued_tooltip": "Auftrag ist in der Warteschlange",
+            "processing_tooltip": "Übersetzung wird gerade durchgeführt",
+            "writing_back_tooltip": "Übersetzter Inhalt wird zurückgeschrieben",
+            "completed_tooltip": "Übersetzung erfolgreich abgeschlossen",
+            "written_back_tooltip": "Inhalt wurde in Shopware zurückgeschrieben",
+            "needs_review_tooltip": "Übersetzung abgeschlossen, manuelle Überprüfung empfohlen",
+            "failed_tooltip": "Übersetzung fehlgeschlagen. Wird automatisch wiederholt",
+            "dead_tooltip": "Übersetzung nach allen Versuchen dauerhaft fehlgeschlagen",
+            "writeback_failed_tooltip": "Zurückschreiben fehlgeschlagen. Zum Wiederholen klicken"
+        },
+        "dashboard": {
+            "title": "Dashboard",
+            "quota": "Übersetzungskontingent",
+            "recentJobs": "Neueste Aufträge",
+            "notConnected": "Nicht verbunden",
+            "notConnectedMessage": "Verbinden Sie Ihr Falara-Konto, um mit dem Übersetzen zu beginnen",
+            "connectNow": "Jetzt verbinden",
+            "stats": {
+                "totalJobs": "Aufträge gesamt",
+                "completedJobs": "Abgeschlossen",
+                "failedJobs": "Fehlgeschlagen",
+                "pendingJobs": "Ausstehend"
+            },
+            "viewAllJobs": "Alle Aufträge anzeigen"
+        },
+        "content": {
+            "title": "Inhalte",
+            "product": "Produkte",
+            "category": "Kategorien",
+            "cms_page": "CMS-Seiten",
+            "snippet": "Textbausteine",
+            "translateSelected": "Auswahl übersetzen",
+            "noItemsSelected": "Keine Elemente ausgewählt",
+            "selectItems": "Bitte wählen Sie Elemente zum Übersetzen aus",
+            "name": "Name",
+            "type": "Typ",
+            "lastTranslated": "Zuletzt übersetzt",
+            "status": "Status",
+            "search": "Suchen...",
+            "itemsSelected": "{count} Element(e) ausgewählt"
+        },
+        "jobs": {
+            "title": "Aufträge",
+            "id": "Auftrags-ID",
+            "type": "Typ",
+            "status": "Status",
+            "sourceLanguage": "Quelle",
+            "targetLanguage": "Ziel",
+            "createdAt": "Erstellt",
+            "updatedAt": "Aktualisiert",
+            "itemCount": "Elemente",
+            "showArchived": "Archivierte anzeigen",
+            "archive": "Archivieren",
+            "retry": "Wiederholen",
+            "viewDetail": "Details anzeigen",
+            "autoRefresh": "Automatische Aktualisierung alle 5 Sekunden",
+            "noJobs": "Keine Aufträge gefunden",
+            "batchLabel": "Batch"
+        },
+        "jobDetail": {
+            "title": "Auftragsdetails",
+            "back": "Zurück zu Aufträgen",
+            "status": "Status",
+            "sourceLanguage": "Quellsprache",
+            "targetLanguage": "Zielsprache",
+            "itemCount": "Elementanzahl",
+            "wordCount": "Wortanzahl",
+            "createdAt": "Erstellt am",
+            "completedAt": "Abgeschlossen am",
+            "writeBackErrors": "Zurückschreib-Fehler",
+            "retryWriteBack": "Zurückschreiben wiederholen",
+            "zombieWarning": "Dieser Auftrag ist seit mehr als 10 Minuten aktiv und könnte feststecken",
+            "stats": "Übersetzungsstatistiken",
+            "errorDetails": "Fehlerdetails",
+            "expandErrors": "Fehler anzeigen",
+            "collapseErrors": "Fehler ausblenden"
+        },
+        "audit": {
+            "title": "Inhalts-Audit",
+            "description": "Scannen Sie Ihre Store-Inhalte auf fehlende Übersetzungen",
+            "runScan": "Scan starten",
+            "scanning": "Scannt...",
+            "results": "Audit-Ergebnisse",
+            "language": "Sprache",
+            "type": "Inhaltstyp",
+            "missing": "Fehlend",
+            "total": "Gesamt",
+            "coverage": "Abdeckung",
+            "recommendation": "Empfehlung",
+            "noResults": "Noch keine Audit-Ergebnisse. Starten Sie einen Scan.",
+            "planRecommendation": "Basierend auf Ihrem Audit empfehlen wir den {plan}-Plan"
+        },
+        "settings": {
+            "title": "Einstellungen",
+            "tabs": {
+                "connection": "Verbindung",
+                "customFields": "Benutzerdefinierte Felder",
+                "defaults": "Übersetzungsstandards"
+            },
+            "connection": {
+                "title": "Falara-Verbindung",
+                "apiKey": "API-Schlüssel",
+                "apiKeyPlaceholder": "Ihren Falara API-Schlüssel eingeben",
+                "salesChannel": "Verkaufskanal",
+                "connect": "Verbinden",
+                "disconnect": "Trennen",
+                "disconnectConfirm": "Möchten Sie wirklich trennen? Alle Übersetzungen werden gestoppt.",
+                "connected": "Verbunden",
+                "connectedAs": "Verbunden als {account}",
+                "notConnected": "Nicht verbunden",
+                "status": "Verbindungsstatus"
+            },
+            "customFields": {
+                "title": "Whitelist für benutzerdefinierte Felder",
+                "description": "Nur auf der Whitelist stehende benutzerdefinierte Felder werden übersetzt",
+                "fieldName": "Feldname",
+                "addField": "Feld hinzufügen",
+                "removeField": "Entfernen",
+                "noFields": "Keine benutzerdefinierten Felder konfiguriert"
+            },
+            "defaults": {
+                "title": "Übersetzungsstandards",
+                "sourceLanguage": "Standard-Quellsprache",
+                "targetLanguages": "Standard-Zielsprachen",
+                "provider": "Standard-Anbieter",
+                "domain": "Standard-Domäne",
+                "tone": "Standard-Ton",
+                "quality": "Qualitätsstufe",
+                "instructions": "Benutzerdefinierte Anweisungen",
+                "glossary": "Standard-Glossar",
+                "save": "Standards speichern"
+            }
+        },
+        "modal": {
+            "title": "Elemente übersetzen",
+            "targetLanguages": "Zielsprachen",
+            "glossary": "Glossar",
+            "noGlossary": "Kein Glossar",
+            "advancedOptions": "Erweiterte Optionen",
+            "domain": "Domäne",
+            "tone": "Ton",
+            "quality": "Qualität",
+            "instructions": "Benutzerdefinierte Anweisungen",
+            "itemCount": "{count} Element(e) ausgewählt",
+            "wordCount": "Geschätzte Wortanzahl: {count}",
+            "translate": "Übersetzung starten",
+            "cancel": "Abbrechen",
+            "noLanguageSelected": "Bitte wählen Sie mindestens eine Zielsprache"
+        },
+        "quota": {
+            "plan": "Plan",
+            "used": "Verwendet",
+            "limit": "Limit",
+            "remaining": "Verbleibend",
+            "warningThreshold": "Sie nähern sich Ihrem Kontingentlimit",
+            "exceeded": "Kontingent überschritten. Bitte upgraden Sie Ihren Plan"
+        }
+    }
+}
