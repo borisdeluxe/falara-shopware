@@ -53,7 +53,7 @@ class TranslateController extends AbstractController
             return new JsonResponse(['error' => sprintf('Unknown content type "%s".', $resourceType)], 404);
         }
 
-        // Server-side duplicate check: look for in-flight jobs with same resourceType + any targetLocale
+        // Server-side duplicate check: look for in-flight jobs with same resourceType + each targetLocale
         foreach ($targetLocales as $targetLocale) {
             $criteria = new Criteria();
             $criteria->addFilter(new EqualsFilter('salesChannelId', $salesChannelId));
@@ -65,7 +65,7 @@ class TranslateController extends AbstractController
             $existing = $this->jobRepository->searchIds($criteria, $context);
             if ($existing->getTotal() > 0) {
                 return new JsonResponse([
-                    'error'       => sprintf(
+                    'error'          => sprintf(
                         'An in-flight job for resource type "%s" and locale "%s" already exists.',
                         $resourceType,
                         $targetLocale,
@@ -94,23 +94,28 @@ class TranslateController extends AbstractController
             return new JsonResponse(['error' => 'Falara API submission failed: ' . $e->getMessage()], 502);
         }
 
-        // Persist local job records
+        // Persist local job records — batch->jobs is an array of associative arrays
         $jobRecords = [];
         $jobIds     = [];
 
         foreach ($batch->jobs as $apiJob) {
-            $localId = Uuid::randomHex();
+            $localId  = Uuid::randomHex();
             $jobIds[] = $localId;
+
+            // Single-target batches have one job per target locale in request order;
+            // multi-target responses carry target_lang in each job entry.
+            $targetLocale = $apiJob['target_lang'] ?? ($targetLocales[0] ?? '');
+            $falaraJobId  = $apiJob['job_id'] ?? '';
 
             $jobRecords[] = [
                 'id'            => $localId,
                 'salesChannelId'=> $salesChannelId,
-                'falaraJobId'   => $apiJob->jobId,
+                'falaraJobId'   => $falaraJobId,
                 'batchId'       => $batch->batchId,
                 'status'        => 'pending',
                 'resourceType'  => $resourceType,
                 'resourceCount' => count($entityIds),
-                'targetLocale'  => $apiJob->targetLang,
+                'targetLocale'  => $targetLocale,
                 'projectName'   => $projectName,
             ];
         }

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/trunk/src/Core/System/SystemConfig/Schema/config.xsd">
+
+    <card>
+        <title>Falara Translation Manager</title>
+        <title lang="de-DE">Falara Übersetzungsmanager</title>
+
+        <input-field type="text">
+            <name>falaraApiUrl</name>
+            <label>Falara API URL</label>
+            <label lang="de-DE">Falara API-URL</label>
+            <defaultValue>https://falara.io</defaultValue>
+            <helpText>Base URL of the Falara translation API. Do not change unless instructed.</helpText>
+            <helpText lang="de-DE">Basis-URL der Falara-Übersetzungs-API. Nur ändern, wenn angewiesen.</helpText>
+        </input-field>
+
+        <input-field type="password">
+            <name>encryptionKey</name>
+            <label>Encryption Key</label>
+            <label lang="de-DE">Verschlüsselungsschlüssel</label>
+            <helpText>32-byte key used to encrypt stored API keys. Must be set before connecting a sales channel.</helpText>
+            <helpText lang="de-DE">32-Byte-Schlüssel zur Verschlüsselung gespeicherter API-Keys. Muss vor dem Verbinden eines Verkaufskanals gesetzt sein.</helpText>
+        </input-field>
+
+    </card>
+
+</config>

@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="falara.api_url">https://falara.io</parameter>
+        <parameter key="falara.encryption_key"></parameter>
+    </parameters>
+
+    <services>
+
+        <!-- ================================================================ -->
+        <!-- Entity Definitions                                                -->
+        <!-- ================================================================ -->
+
+        <service id="Falara\TranslationManager\Core\Content\Connection\FalaraConnectionDefinition">
+            <tag name="shopware.entity.definition" entity="falara_connection"/>
+        </service>
+
+        <service id="Falara\TranslationManager\Core\Content\Job\FalaraJobDefinition">
+            <tag name="shopware.entity.definition" entity="falara_job"/>
+        </service>
+
+        <service id="Falara\TranslationManager\Core\Content\TranslationDefault\FalaraTranslationDefaultDefinition">
+            <tag name="shopware.entity.definition" entity="falara_translation_default"/>
+        </service>
+
+        <service id="Falara\TranslationManager\Core\Content\CustomFieldWhitelist\FalaraCustomFieldWhitelistDefinition">
+            <tag name="shopware.entity.definition" entity="falara_custom_field_whitelist"/>
+        </service>
+
+        <!-- ================================================================ -->
+        <!-- Core Services                                                     -->
+        <!-- ================================================================ -->
+
+        <service id="Falara\TranslationManager\Service\EncryptionService">
+            <argument>%falara.encryption_key%</argument>
+        </service>
+
+        <service id="Falara\TranslationManager\Service\WordCounter"/>
+
+        <service id="Falara\TranslationManager\Service\ConnectionService">
+            <argument type="service" id="falara_connection.repository"/>
+            <argument type="service" id="falara_job.repository"/>
+            <argument type="service" id="Falara\TranslationManager\Service\EncryptionService"/>
+            <argument>%falara.api_url%</argument>
+            <argument type="service" id="GuzzleHttp\ClientInterface"/>
+        </service>
+
+        <service id="Falara\TranslationManager\Service\TranslationWriter">
+            <argument type="service" id="Doctrine\DBAL\Connection"/>
+            <argument type="service" id="Falara\TranslationManager\Core\ContentType\ContentTypeRegistry"/>
+            <argument type="service" id="falara_job.repository"/>
+            <argument type="service" id="logger"/>
+        </service>
+
+        <!-- ================================================================ -->
+        <!-- Content Type Registry                                             -->
+        <!-- ================================================================ -->
+
+        <service id="Falara\TranslationManager\Core\ContentType\ContentTypeRegistry"/>
+
+        <!-- ================================================================ -->
+        <!-- Content Types                                                     -->
+        <!-- ================================================================ -->
+
+        <service id="Falara\TranslationManager\Core\ContentType\ProductContentType">
+            <argument type="service" id="product.repository"/>
+            <argument type="service" id="Falara\TranslationManager\Service\WordCounter"/>
+            <argument type="service" id="logger"/>
+            <tag name="falara.content_type"/>
+        </service>
+
+        <service id="Falara\TranslationManager\Core\ContentType\CategoryContentType">
+            <argument type="service" id="category.repository"/>
+            <argument type="service" id="Falara\TranslationManager\Service\WordCounter"/>
+            <argument type="service" id="logger"/>
+            <tag name="falara.content_type"/>
+        </service>
+
+        <service id="Falara\TranslationManager\Core\ContentType\CmsPageContentType">
+            <argument type="service" id="cms_page.repository"/>
+            <argument type="service" id="Falara\TranslationManager\Service\WordCounter"/>
+            <argument type="service" id="logger"/>
+            <tag name="falara.content_type"/>
+        </service>
+
+        <service id="Falara\TranslationManager\Core\ContentType\SnippetContentType">
+            <argument type="service" id="snippet.repository"/>
+            <argument type="service" id="Falara\TranslationManager\Service\WordCounter"/>
+            <argument type="service" id="logger"/>
+            <tag name="falara.content_type"/>
+        </service>
+
+        <!-- ================================================================ -->
+        <!-- Message Queue                                                     -->
+        <!-- ================================================================ -->
+
+        <service id="Falara\TranslationManager\MessageQueue\FalaraWriteBackHandler">
+            <argument type="service" id="Falara\TranslationManager\Service\TranslationWriter"/>
+            <argument type="service" id="Falara\TranslationManager\Service\ConnectionService"/>
+            <argument type="service" id="falara_job.repository"/>
+            <argument type="service" id="logger"/>
+            <tag name="messenger.message_handler"/>
+        </service>
+
+        <!-- ================================================================ -->
+        <!-- Scheduled Task                                                    -->
+        <!-- ================================================================ -->
+
+        <service id="Falara\TranslationManager\ScheduledTask\FalaraPollTask">
+            <tag name="shopware.scheduled.task"/>
+        </service>
+
+        <service id="Falara\TranslationManager\ScheduledTask\FalaraPollTaskHandler">
+            <argument type="service" id="scheduled_task.repository"/>
+            <argument type="service" id="logger"/>
+            <argument type="service" id="falara_job.repository"/>
+            <argument type="service" id="Falara\TranslationManager\Service\ConnectionService"/>
+            <argument type="service" id="messenger.bus.shopware"/>
+            <argument type="service" id="Doctrine\DBAL\Connection"/>
+            <tag name="messenger.message_handler"/>
+        </service>
+
+        <!-- ================================================================ -->
+        <!-- Console Command                                                   -->
+        <!-- ================================================================ -->
+
+        <service id="Falara\TranslationManager\Command\PollJobsCommand">
+            <argument type="service" id="falara_job.repository"/>
+            <argument type="service" id="Falara\TranslationManager\Service\ConnectionService"/>
+            <argument type="service" id="messenger.bus.shopware"/>
+            <argument type="service" id="Doctrine\DBAL\Connection"/>
+            <argument type="service" id="logger"/>
+            <tag name="console.command"/>
+        </service>
+
+        <!-- ================================================================ -->
+        <!-- Controllers                                                       -->
+        <!-- ================================================================ -->
+
+        <service id="Falara\TranslationManager\Controller\Api\ConnectionController" public="true">
+            <argument type="service" id="Falara\TranslationManager\Service\ConnectionService"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+
+        <service id="Falara\TranslationManager\Controller\Api\ContentController" public="true">
+            <argument type="service" id="Falara\TranslationManager\Core\ContentType\ContentTypeRegistry"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+
+        <service id="Falara\TranslationManager\Controller\Api\TranslateController" public="true">
+            <argument type="service" id="Falara\TranslationManager\Service\ConnectionService"/>
+            <argument type="service" id="Falara\TranslationManager\Core\ContentType\ContentTypeRegistry"/>
+            <argument type="service" id="falara_job.repository"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+
+        <service id="Falara\TranslationManager\Controller\Api\JobController" public="true">
+            <argument type="service" id="falara_job.repository"/>
+            <argument type="service" id="messenger.bus.shopware"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+
+        <service id="Falara\TranslationManager\Controller\Api\AuditController" public="true">
+            <argument type="service" id="Falara\TranslationManager\Core\ContentType\ContentTypeRegistry"/>
+            <argument type="service" id="Falara\TranslationManager\Service\ConnectionService"/>
+            <argument type="service" id="falara_job.repository"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+
+        <service id="Falara\TranslationManager\Controller\Api\SettingsController" public="true">
+            <argument type="service" id="falara_translation_default.repository"/>
+            <argument type="service" id="falara_custom_field_whitelist.repository"/>
+            <argument type="service" id="Falara\TranslationManager\Service\ConnectionService"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+
+        <service id="Falara\TranslationManager\Controller\Webhook\WebhookController" public="true">
+            <argument type="service" id="falara_job.repository"/>
+            <argument type="service" id="Falara\TranslationManager\Service\ConnectionService"/>
+            <argument type="service" id="messenger.bus.shopware"/>
+            <argument type="service" id="logger"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+        </service>
+
+    </services>
+</container>
