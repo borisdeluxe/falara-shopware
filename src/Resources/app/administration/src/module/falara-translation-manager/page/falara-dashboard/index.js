@@ -230,7 +230,7 @@ Component.register('falara-dashboard', {
 
                     try {
                         const jobsResp = await falaraApiService.getJobs(this.salesChannelId, { limit: 10 });
-                        const jobs = jobsResp.data?.items || [];
+                        const jobs = jobsResp.data?.jobs || jobsResp.data?.items || [];
                         this.recentJobs = jobs.slice(0, 5);
                         this.stats.total = jobs.length;
                         this.stats.completed = jobs.filter(j => ['completed', 'written_back'].includes(j.status)).length;

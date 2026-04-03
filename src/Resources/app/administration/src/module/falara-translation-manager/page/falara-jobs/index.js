@@ -125,7 +125,7 @@ Component.register('falara-jobs', {
                 const falaraApiService = Shopware.Service('falaraApiService');
                 const params = { archived: this.showArchived ? '1' : '0' };
                 const resp = await falaraApiService.getJobs(this.salesChannelId, params);
-                this.jobs = resp.data?.items || [];
+                this.jobs = resp.data?.jobs || resp.data?.items || [];
             } catch (e) {
                 this.jobs = [];
             } finally {
