@@ -161,25 +161,34 @@ Component.register('falara-settings', {
                             </div>
 
                             <div :style="fieldWrapStyle">
-                                <mt-text-field
-                                    label="Domain"
-                                    v-model="defaults.domain"
-                                />
+                                <label :style="nativeSelectLabelStyle">Domain</label>
+                                <select v-model="defaults.domain" :style="nativeSelectStyle">
+                                    <option value="">None</option>
+                                    <option value="e-commerce">E-Commerce</option>
+                                    <option value="marketing">Marketing</option>
+                                    <option value="legal">Legal</option>
+                                    <option value="medical">Medical</option>
+                                    <option value="technical">Technical</option>
+                                    <option value="software">Software</option>
+                                </select>
                             </div>
 
                             <div :style="fieldWrapStyle">
-                                <mt-text-field
-                                    label="Tone"
-                                    v-model="defaults.tone"
-                                />
+                                <label :style="nativeSelectLabelStyle">Tone</label>
+                                <select v-model="defaults.tone" :style="nativeSelectStyle">
+                                    <option value="">None</option>
+                                    <option value="formal">Formal</option>
+                                    <option value="casual">Casual</option>
+                                    <option value="technical">Technical</option>
+                                </select>
                             </div>
 
                             <div :style="fieldWrapStyle">
-                                <mt-select
-                                    label="Quality"
-                                    v-model="defaults.quality"
-                                    :options="qualityOptions"
-                                />
+                                <label :style="nativeSelectLabelStyle">Quality</label>
+                                <select v-model="defaults.quality" :style="nativeSelectStyle">
+                                    <option value="standard">Standard</option>
+                                    <option value="premium">Premium</option>
+                                </select>
                             </div>
 
                             <div :style="fieldWrapStyle">
