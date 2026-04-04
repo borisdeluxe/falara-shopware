@@ -2,72 +2,84 @@ const { Component } = Shopware;
 
 Component.register('falara-jobs', {
     template: `
-        <div class="falara-jobs">
+        <div>
             <falara-nav-tabs />
             <div :style="{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }">
-                <mt-card :title="$t('falara-translation-manager.jobs.title')">
-                    <div class="falara-jobs__toolbar">
-                        <mt-switch
-                            :label="$t('falara-translation-manager.jobs.showArchived')"
-                            v-model="showArchived"
-                            @change="loadJobs"
-                        />
-                        <span class="falara-jobs__auto-refresh">{{ $t('falara-translation-manager.jobs.autoRefresh') }}</span>
+                <div :style="{ background: '#fff', borderRadius: '10px', padding: '24px', border: '1px solid #e5e7eb', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }">
+                    <h2 :style="{ margin: '0 0 20px 0', fontSize: '20px', fontWeight: '600', color: '#111827' }">Translation Jobs</h2>
+
+                    <div :style="{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }">
+                        <label :style="{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '14px', color: '#374151' }">
+                            <input
+                                type="checkbox"
+                                v-model="showArchived"
+                                @change="loadJobs"
+                                :style="{ width: '16px', height: '16px', cursor: 'pointer' }"
+                            />
+                            Show Archived
+                        </label>
+                        <span :style="{ fontSize: '13px', color: '#9ca3af' }">Auto-refreshing every 5s</span>
                     </div>
 
-                    <mt-loader v-if="isLoading" />
-
-                    <div v-else>
-                        <div v-if="jobs.length === 0">
-                            <p>{{ $t('falara-translation-manager.jobs.noJobs') }}</p>
-                        </div>
-
-                        <div v-else>
-                            <div v-for="(batchJobs, batchId) in groupedJobs" :key="batchId" class="falara-jobs__batch">
-                                <div class="falara-jobs__batch-header">
-                                    <strong>{{ $t('falara-translation-manager.jobs.batchLabel') }}: {{ batchId }}</strong>
-                                    <span class="falara-jobs__batch-count">({{ batchJobs.length }})</span>
-                                </div>
-                                <table class="falara-jobs__table">
-                                    <thead>
-                                        <tr>
-                                            <th>{{ $t('falara-translation-manager.jobs.type') }}</th>
-                                            <th>{{ $t('falara-translation-manager.jobs.status') }}</th>
-                                            <th>{{ $t('falara-translation-manager.jobs.sourceLanguage') }}</th>
-                                            <th>{{ $t('falara-translation-manager.jobs.targetLanguage') }}</th>
-                                            <th>{{ $t('falara-translation-manager.jobs.itemCount') }}</th>
-                                            <th>{{ $t('falara-translation-manager.jobs.createdAt') }}</th>
-                                            <th></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="job in batchJobs" :key="job.id" class="falara-jobs__row">
-                                            <td>{{ job.contentType }}</td>
-                                            <td><falara-status-badge :status="job.status" /></td>
-                                            <td>{{ job.sourceLanguage }}</td>
-                                            <td>{{ job.targetLanguage }}</td>
-                                            <td>{{ job.itemCount }}</td>
-                                            <td>{{ formatDate(job.createdAt) }}</td>
-                                            <td class="falara-jobs__actions">
-                                                <mt-button variant="ghost" size="small" @click="viewJob(job.id)">
-                                                    {{ $t('falara-translation-manager.jobs.viewDetail') }}
-                                                </mt-button>
-                                                <mt-button
-                                                    v-if="!job.archived"
-                                                    variant="ghost"
-                                                    size="small"
-                                                    @click="archiveJob(job.id)"
-                                                >
-                                                    {{ $t('falara-translation-manager.jobs.archive') }}
-                                                </mt-button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                    <div v-if="isLoading" :style="{ textAlign: 'center', padding: '40px', color: '#6b7280' }">
+                        Loading...
                     </div>
-                </mt-card>
+
+                    <div v-else-if="jobs.length === 0" :style="{ textAlign: 'center', padding: '48px 24px', color: '#9ca3af', fontSize: '15px' }">
+                        No translation jobs yet
+                    </div>
+
+                    <div v-else :style="{ overflowX: 'auto' }">
+                        <table :style="{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }">
+                            <thead>
+                                <tr :style="{ background: '#f9fafb', borderBottom: '2px solid #e5e7eb' }">
+                                    <th :style="{ padding: '10px 14px', textAlign: 'left', fontWeight: '600', color: '#374151', whiteSpace: 'nowrap' }">Project</th>
+                                    <th :style="{ padding: '10px 14px', textAlign: 'left', fontWeight: '600', color: '#374151', whiteSpace: 'nowrap' }">Type</th>
+                                    <th :style="{ padding: '10px 14px', textAlign: 'left', fontWeight: '600', color: '#374151', whiteSpace: 'nowrap' }">Target</th>
+                                    <th :style="{ padding: '10px 14px', textAlign: 'left', fontWeight: '600', color: '#374151', whiteSpace: 'nowrap' }">Items</th>
+                                    <th :style="{ padding: '10px 14px', textAlign: 'left', fontWeight: '600', color: '#374151', whiteSpace: 'nowrap' }">Words</th>
+                                    <th :style="{ padding: '10px 14px', textAlign: 'left', fontWeight: '600', color: '#374151', whiteSpace: 'nowrap' }">Status</th>
+                                    <th :style="{ padding: '10px 14px', textAlign: 'left', fontWeight: '600', color: '#374151', whiteSpace: 'nowrap' }">Created</th>
+                                    <th :style="{ padding: '10px 14px', textAlign: 'left', fontWeight: '600', color: '#374151', whiteSpace: 'nowrap' }">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                    v-for="(job, index) in jobs"
+                                    :key="job.id"
+                                    :style="{ background: index % 2 === 0 ? '#fff' : '#f9fafb', borderBottom: '1px solid #e5e7eb' }"
+                                >
+                                    <td :style="{ padding: '10px 14px', color: '#374151', maxWidth: '160px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }">
+                                        {{ job.projectName || '-' }}
+                                    </td>
+                                    <td :style="{ padding: '10px 14px', color: '#374151' }">{{ job.resourceType }}</td>
+                                    <td :style="{ padding: '10px 14px', color: '#374151' }">{{ job.targetLocale }}</td>
+                                    <td :style="{ padding: '10px 14px', color: '#374151' }">{{ job.resourceCount }}</td>
+                                    <td :style="{ padding: '10px 14px', color: '#374151' }">{{ job.wordCount }}</td>
+                                    <td :style="{ padding: '10px 14px' }">
+                                        <falara-status-badge :status="job.status" />
+                                    </td>
+                                    <td :style="{ padding: '10px 14px', color: '#374151', whiteSpace: 'nowrap' }">{{ formatDate(job.createdAt) }}</td>
+                                    <td :style="{ padding: '10px 14px', display: 'flex', gap: '8px', alignItems: 'center' }">
+                                        <button
+                                            @click="viewJob(job.id)"
+                                            :style="{ padding: '4px 12px', fontSize: '13px', border: '1px solid #d1d5db', borderRadius: '6px', background: '#fff', color: '#374151', cursor: 'pointer' }"
+                                        >
+                                            View
+                                        </button>
+                                        <button
+                                            v-if="!job.archived"
+                                            @click="archiveJob(job.id)"
+                                            :style="{ padding: '4px 12px', fontSize: '13px', border: '1px solid #d1d5db', borderRadius: '6px', background: '#fff', color: '#6b7280', cursor: 'pointer' }"
+                                        >
+                                            Archive
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     `,
@@ -80,20 +92,6 @@ Component.register('falara-jobs', {
             salesChannelId: null,
             pollInterval: null,
         };
-    },
-
-    computed: {
-        groupedJobs() {
-            const groups = {};
-            this.jobs.forEach(job => {
-                const batchId = job.batchId || job.id;
-                if (!groups[batchId]) {
-                    groups[batchId] = [];
-                }
-                groups[batchId].push(job);
-            });
-            return groups;
-        },
     },
 
     created() {
@@ -147,7 +145,7 @@ Component.register('falara-jobs', {
         },
 
         viewJob(jobId) {
-            this.$router.push({ name: 'falara.translation.manager.job.detail', params: { id: jobId } });
+            this..push({ name: 'falara.translation.manager.job.detail', params: { id: jobId } });
         },
 
         async archiveJob(jobId) {
