@@ -16,19 +16,19 @@ class FalaraJobEntity extends Entity
 
     protected ?string $batchId = null;
 
-    protected ?string $status = 'pending';
+    protected string $status = 'pending';
 
     protected ?string $resourceType = null;
 
-    protected ?int $resourceCount = 0;
+    protected int $resourceCount = 0;
 
     protected ?string $targetLocale = null;
 
-    protected ?int $wordCount = 0;
+    protected int $wordCount = 0;
 
     protected ?string $projectName = null;
 
-    protected ?bool $archived = false;
+    protected bool $archived = false;
 
     protected ?array $exportWarnings = null;
 
@@ -68,12 +68,12 @@ class FalaraJobEntity extends Entity
         $this->batchId = $batchId;
     }
 
-    public function getStatus(): ?string
+    public function getStatus(): string
     {
         return $this->status;
     }
 
-    public function setStatus(?string $status): void
+    public function setStatus(string $status): void
     {
         $this->status = $status;
     }
@@ -88,12 +88,12 @@ class FalaraJobEntity extends Entity
         $this->resourceType = $resourceType;
     }
 
-    public function getResourceCount(): ?int
+    public function getResourceCount(): int
     {
         return $this->resourceCount;
     }
 
-    public function setResourceCount(?int $resourceCount): void
+    public function setResourceCount(int $resourceCount): void
     {
         $this->resourceCount = $resourceCount;
     }
@@ -108,12 +108,12 @@ class FalaraJobEntity extends Entity
         $this->targetLocale = $targetLocale;
     }
 
-    public function getWordCount(): ?int
+    public function getWordCount(): int
     {
         return $this->wordCount;
     }
 
-    public function setWordCount(?int $wordCount): void
+    public function setWordCount(int $wordCount): void
     {
         $this->wordCount = $wordCount;
     }
@@ -128,12 +128,12 @@ class FalaraJobEntity extends Entity
         $this->projectName = $projectName;
     }
 
-    public function getArchived(): ?bool
+    public function getArchived(): bool
     {
         return $this->archived;
     }
 
-    public function setArchived(?bool $archived): void
+    public function setArchived(bool $archived): void
     {
         $this->archived = $archived;
     }

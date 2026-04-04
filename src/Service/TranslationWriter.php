@@ -31,10 +31,10 @@ class TranslationWriter
             'UPDATE falara_job SET status = :newStatus, updated_at = NOW(3)
              WHERE id = :id AND status IN (:statusCompleted, :statusNeedsReview)',
             [
-                'newStatus'        => 'writing_back',
+                'newStatus'        => JobStatus::WRITING_BACK,
                 'id'               => Uuid::fromHexToBytes($jobId),
-                'statusCompleted'  => 'completed',
-                'statusNeedsReview'=> 'needs_review',
+                'statusCompleted'  => JobStatus::COMPLETED,
+                'statusNeedsReview'=> JobStatus::NEEDS_REVIEW,
             ],
         );
 
@@ -95,7 +95,7 @@ class TranslationWriter
                     entityId:   '',
                     entityType: $entityType,
                     field:      '',
-                    code:       'IMPORT_EXCEPTION',
+                    code:       ErrorCode::IMPORT_EXCEPTION->value,
                     message:    $e->getMessage(),
                 );
                 $merged->merge($importResult);
@@ -112,7 +112,7 @@ class TranslationWriter
     {
         $payload = [
             'id'          => $jobId,
-            'status'      => 'written_back',
+            'status'      => JobStatus::WRITTEN_BACK,
             'completedAt' => (new \DateTimeImmutable())->format('Y-m-d H:i:s.v'),
         ];
 
@@ -130,8 +130,8 @@ class TranslationWriter
     {
         $this->jobRepository->update([[
             'id'             => $jobId,
-            'status'         => 'writeback_failed',
-            'writebackErrors'=> [['code' => 'WRITEBACK_FAILED', 'message' => $errorMessage]],
+            'status'         => JobStatus::WRITEBACK_FAILED,
+            'writebackErrors'=> [['code' => ErrorCode::WRITEBACK_FAILED->value, 'message' => $errorMessage]],
         ]], $context);
     }
 }

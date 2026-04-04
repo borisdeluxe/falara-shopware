@@ -45,7 +45,7 @@ class CategoryContentType extends AbstractContentType
         $langContext = $this->createContextWithLanguage($sourceLanguageId, $context);
 
         $criteria   = new Criteria($entityIds);
-        $categories = $this->repository->search($criteria, $context);
+        $categories = $this->repository->search($criteria, $langContext);
 
         $result = [];
         foreach ($categories as $category) {
@@ -81,7 +81,7 @@ class CategoryContentType extends AbstractContentType
         $criteria->setLimit($limit);
         $criteria->setOffset($offset);
 
-        $categories = $this->repository->search($criteria, $context);
+        $categories = $this->repository->search($criteria, $langContext);
 
         $items = [];
         foreach ($categories as $category) {
@@ -108,6 +108,6 @@ class CategoryContentType extends AbstractContentType
         $criteria    = new Criteria();
         $criteria->setLimit(1);
 
-        return $this->repository->search($criteria, $context)->getTotal();
+        return $this->repository->search($criteria, $langContext)->getTotal();
     }
 }

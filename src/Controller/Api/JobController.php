@@ -2,7 +2,9 @@
 
 namespace Falara\TranslationManager\Controller\Api;
 
+use Falara\TranslationManager\Core\Content\Job\FalaraJobEntity;
 use Falara\TranslationManager\MessageQueue\FalaraWriteBackMessage;
+use Falara\TranslationManager\Service\JobStatus;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -47,21 +49,7 @@ class JobController extends AbstractController
 
         $jobs = [];
         foreach ($result as $job) {
-            $jobs[] = [
-                'id'             => $job->getId(),
-                'falaraJobId'    => $job->getFalaraJobId(),
-                'batchId'        => $job->getBatchId(),
-                'status'         => $job->getStatus(),
-                'resourceType'   => $job->getResourceType(),
-                'resourceCount'  => $job->getResourceCount(),
-                'targetLocale'   => $job->getTargetLocale(),
-                'wordCount'      => $job->getWordCount(),
-                'projectName'    => $job->getProjectName(),
-                'archived'       => $job->getArchived(),
-                'exportWarnings' => $job->getExportWarnings(),
-                'writebackErrors'=> $job->getWritebackErrors(),
-                'completedAt'    => $job->getCompletedAt()?->format(\DateTimeInterface::ATOM),
-            ];
+            $jobs[] = $this->serializeJob($job);
         }
 
         return new JsonResponse([
@@ -84,21 +72,7 @@ class JobController extends AbstractController
             return new JsonResponse(['error' => 'Job not found.'], 404);
         }
 
-        return new JsonResponse([
-            'id'             => $job->getId(),
-            'falaraJobId'    => $job->getFalaraJobId(),
-            'batchId'        => $job->getBatchId(),
-            'status'         => $job->getStatus(),
-            'resourceType'   => $job->getResourceType(),
-            'resourceCount'  => $job->getResourceCount(),
-            'targetLocale'   => $job->getTargetLocale(),
-            'wordCount'      => $job->getWordCount(),
-            'projectName'    => $job->getProjectName(),
-            'archived'       => $job->getArchived(),
-            'exportWarnings' => $job->getExportWarnings(),
-            'writebackErrors'=> $job->getWritebackErrors(),
-            'completedAt'    => $job->getCompletedAt()?->format(\DateTimeInterface::ATOM),
-        ]);
+        return new JsonResponse($this->serializeJob($job));
     }
 
     #[Route(
@@ -115,9 +89,9 @@ class JobController extends AbstractController
             return new JsonResponse(['error' => 'Job not found.'], 404);
         }
 
-        if ($job->getStatus() !== 'writeback_failed') {
+        if ($job->getStatus() !== JobStatus::WRITEBACK_FAILED) {
             return new JsonResponse(
-                ['error' => sprintf('Job status is "%s", only "writeback_failed" jobs can be retried.', $job->getStatus())],
+                ['error' => sprintf('Job status is "%s", only "%s" jobs can be retried.', $job->getStatus(), JobStatus::WRITEBACK_FAILED)],
                 409,
             );
         }
@@ -147,5 +121,24 @@ class JobController extends AbstractController
         $this->jobRepository->update([['id' => $id, 'archived' => $archived]], $context);
 
         return new JsonResponse(['id' => $id, 'archived' => $archived]);
+    }
+
+    private function serializeJob(FalaraJobEntity $job): array
+    {
+        return [
+            'id'             => $job->getId(),
+            'falaraJobId'    => $job->getFalaraJobId(),
+            'batchId'        => $job->getBatchId(),
+            'status'         => $job->getStatus(),
+            'resourceType'   => $job->getResourceType(),
+            'resourceCount'  => $job->getResourceCount(),
+            'targetLocale'   => $job->getTargetLocale(),
+            'wordCount'      => $job->getWordCount(),
+            'projectName'    => $job->getProjectName(),
+            'archived'       => $job->getArchived(),
+            'exportWarnings' => $job->getExportWarnings(),
+            'writebackErrors'=> $job->getWritebackErrors(),
+            'completedAt'    => $job->getCompletedAt()?->format(\DateTimeInterface::ATOM),
+        ];
     }
 }

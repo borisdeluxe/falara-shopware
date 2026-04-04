@@ -63,7 +63,7 @@ Component.register('falara-job-detail', {
                             fontSize: '14px'
                         }"
                     >
-                        ⚠ This job has been in <strong>{{ job.status }}</strong> for more than 10 minutes and may be stuck.
+                        ⚠ This job has been in <strong>{{ job.status }}</strong> for more than 15 minutes and may be stuck.
                     </div>
 
                     <!-- Info Grid -->
@@ -263,7 +263,7 @@ Component.register('falara-job-detail', {
             if (!['pending', 'processing', 'queued'].includes(this.job.status)) return false;
             const created = new Date(this.job.createdAt);
             const diffMinutes = (Date.now() - created.getTime()) / 1000 / 60;
-            return diffMinutes > 10;
+            return diffMinutes > 15;
         },
 
         hasExportWarnings() {

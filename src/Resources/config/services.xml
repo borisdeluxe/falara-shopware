@@ -54,6 +54,14 @@
             <argument type="service" id="logger"/>
         </service>
 
+        <service id="Falara\TranslationManager\Service\JobPollingService">
+            <argument type="service" id="falara_job.repository"/>
+            <argument type="service" id="Falara\TranslationManager\Service\ConnectionService"/>
+            <argument type="service" id="messenger.bus.default"/>
+            <argument type="service" id="Doctrine\DBAL\Connection"/>
+            <argument type="service" id="logger"/>
+        </service>
+
         <!-- ================================================================ -->
         <!-- Content Type Registry                                             -->
         <!-- ================================================================ -->
@@ -118,10 +126,7 @@
         <service id="Falara\TranslationManager\ScheduledTask\FalaraPollTaskHandler">
             <argument type="service" id="scheduled_task.repository"/>
             <argument type="service" id="logger"/>
-            <argument type="service" id="falara_job.repository"/>
-            <argument type="service" id="Falara\TranslationManager\Service\ConnectionService"/>
-            <argument type="service" id="messenger.bus.default"/>
-            <argument type="service" id="Doctrine\DBAL\Connection"/>
+            <argument type="service" id="Falara\TranslationManager\Service\JobPollingService"/>
             <tag name="messenger.message_handler"/>
         </service>
 
@@ -130,11 +135,7 @@
         <!-- ================================================================ -->
 
         <service id="Falara\TranslationManager\Command\PollJobsCommand">
-            <argument type="service" id="falara_job.repository"/>
-            <argument type="service" id="Falara\TranslationManager\Service\ConnectionService"/>
-            <argument type="service" id="messenger.bus.default"/>
-            <argument type="service" id="Doctrine\DBAL\Connection"/>
-            <argument type="service" id="logger"/>
+            <argument type="service" id="Falara\TranslationManager\Service\JobPollingService"/>
             <tag name="console.command"/>
         </service>
 

@@ -4,6 +4,7 @@ namespace Falara\TranslationManager\Controller\Webhook;
 
 use Falara\TranslationManager\MessageQueue\FalaraWriteBackMessage;
 use Falara\TranslationManager\Service\ConnectionService;
+use Falara\TranslationManager\Service\JobStatus;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -128,7 +129,7 @@ class WebhookController extends AbstractController
     {
         $this->jobRepository->update([[
             'id'     => $localId,
-            'status' => 'completed',
+            'status' => JobStatus::COMPLETED,
         ]], $context);
 
         $this->messageBus->dispatch(new FalaraWriteBackMessage($localId, $salesChannelId));
@@ -140,7 +141,7 @@ class WebhookController extends AbstractController
     {
         $this->jobRepository->update([[
             'id'     => $localId,
-            'status' => 'failed',
+            'status' => JobStatus::FAILED,
         ]], $context);
 
         $this->logger->info('Falara webhook: job marked failed', ['job_id' => $localId]);

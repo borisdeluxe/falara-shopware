@@ -14,6 +14,10 @@ use Shopware\Core\System\Snippet\Files\SnippetFileCollectionFactory;
 
 class SnippetContentType implements ContentTypeInterface
 {
+    private array $mergedSnippetsCache = [];
+
+    private ?\Shopware\Core\System\Snippet\Files\SnippetFileCollection $snippetFileCollectionCache = null;
+
     public function __construct(
         private readonly EntityRepository $snippetRepository,
         private readonly EntityRepository $snippetSetRepository,
@@ -276,11 +280,19 @@ class SnippetContentType implements ContentTypeInterface
 
     private function getPopulatedSnippetFileCollection(): \Shopware\Core\System\Snippet\Files\SnippetFileCollection
     {
-        return $this->snippetFileCollectionFactory->createSnippetFileCollection();
+        if ($this->snippetFileCollectionCache === null) {
+            $this->snippetFileCollectionCache = $this->snippetFileCollectionFactory->createSnippetFileCollection();
+        }
+        return $this->snippetFileCollectionCache;
     }
 
     private function getMergedSnippets(string $languageId, Context $context, ?string $group = null): array
     {
+        $cacheKey = $languageId . '|' . ($group ?? '__all__');
+        if (isset($this->mergedSnippetsCache[$cacheKey])) {
+            return $this->mergedSnippetsCache[$cacheKey];
+        }
+
         $localeCode = $this->getLocaleCodeForLanguage($languageId, $context);
         if ($localeCode === null) {
             $this->logger->warning('[snippet] Could not resolve locale code for language.', ['languageId' => $languageId]);
@@ -364,6 +376,7 @@ class SnippetContentType implements ContentTypeInterface
             }
         }
 
+        $this->mergedSnippetsCache[$cacheKey] = $snippets;
         return $snippets;
     }
 

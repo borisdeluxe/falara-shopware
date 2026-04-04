@@ -131,124 +131,25 @@ class CmsPageContentType extends AbstractContentType
     }
 
     /**
-     * Writes slot config translations back via the cms_page repository.
-     * Field format: slot.<slotId>.<configKey>
+     * CMS slot write-back is not yet implemented.
+     * All items are returned as skipped with an appropriate error code.
      */
     public function import(array $translations, string $targetLanguageId, Context $context): ImportResult
     {
-        $result      = new ImportResult();
-        $langContext = $this->createContextWithLanguage($targetLanguageId, $context);
+        $result = new ImportResult();
 
-        // Group by page entity_id
-        $grouped = [];
         foreach ($translations as $translation) {
-            $entityId = $translation['entity_id'] ?? null;
-            if ($entityId === null) {
-                continue;
-            }
-            $grouped[$entityId][] = $translation;
-        }
+            $entityId = $translation['entity_id'] ?? 'unknown';
+            $field    = $translation['field'] ?? '';
 
-        foreach ($grouped as $pageId => $items) {
-            // Check page exists and load with slot associations
-            $criteria = new Criteria([$pageId]);
-            $criteria->addAssociation('sections.blocks.slots');
-            $pages = $this->repository->search($criteria, $langContext);
-            $page  = $pages->first();
-
-            if ($page === null) {
-                foreach ($items as $item) {
-                    $result->addError(
-                        $pageId,
-                        $this->getType(),
-                        $item['field'] ?? '',
-                        ErrorCode::ENTITY_DELETED->value,
-                        ErrorCode::ENTITY_DELETED->message(),
-                    );
-                    $result->skipped++;
-                }
-                continue;
-            }
-
-            // Build a slotId => slot map for quick lookup
-            $slotMap = [];
-            foreach ($page->getSections() ?? [] as $section) {
-                foreach ($section->getBlocks() ?? [] as $block) {
-                    foreach ($block->getSlots() ?? [] as $slot) {
-                        $slotMap[$slot->getId()] = $slot;
-                    }
-                }
-            }
-
-            // Process each translation item
-            foreach ($items as $item) {
-                $field = $item['field'] ?? '';
-                $text  = $item['text'] ?? null;
-
-                // Expected format: slot.<slotId>.<configKey>
-                $parts = explode('.', $field, 3);
-                if (count($parts) !== 3 || $parts[0] !== 'slot') {
-                    $result->addError(
-                        $pageId,
-                        $this->getType(),
-                        $field,
-                        ErrorCode::CMS_SLOT_SKIPPED->value,
-                        ErrorCode::CMS_SLOT_SKIPPED->message(),
-                    );
-                    $result->skipped++;
-                    continue;
-                }
-
-                [, $slotId, $configKey] = $parts;
-
-                $slot = $slotMap[$slotId] ?? null;
-                if ($slot === null) {
-                    $result->addError(
-                        $pageId,
-                        $this->getType(),
-                        $field,
-                        ErrorCode::ENTITY_DELETED->value,
-                        ErrorCode::ENTITY_DELETED->message(),
-                    );
-                    $result->skipped++;
-                    continue;
-                }
-
-                $config = $slot->getConfig() ?? [];
-                if (!is_array($config)) {
-                    $config = [];
-                }
-
-                $config[$configKey] = array_merge($config[$configKey] ?? [], ['value' => $text]);
-
-                try {
-                    // cms_slot repository is not injected here; write via cms_page slot update
-                    // We write back through the slot entity using the page repository association
-                    $this->repository->update([
-                        [
-                            'id'       => $pageId,
-                            'sections' => [],  // placeholder: slot update requires cms_slot repo
-                        ],
-                    ], $langContext);
-
-                    // Note: full slot config update requires the cms_slot repository.
-                    // This implementation writes what it can; callers should inject cms_slot repo for full support.
-                    $result->written++;
-                } catch (\Throwable $e) {
-                    $this->logger->error(
-                        sprintf('[cms_page] Write-back failed for slot %s on page %s: %s', $slotId, $pageId, $e->getMessage()),
-                        ['exception' => $e],
-                    );
-                    $result->addError(
-                        $pageId,
-                        $this->getType(),
-                        $field,
-                        ErrorCode::UNKNOWN_WRITE_ERROR->value,
-                        ErrorCode::UNKNOWN_WRITE_ERROR->message(),
-                    );
-                    $result->skipped++;
-                }
-            }
+            $result->addError(
+                $entityId,
+                $this->getType(),
+                $field,
+                ErrorCode::CMS_SLOT_SKIPPED->value,
+                'CMS slot write-back not yet implemented',
+            );
+            $result->skipped++;
         }
 
         return $result;

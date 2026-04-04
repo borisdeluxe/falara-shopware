@@ -66,12 +66,12 @@ class ConnectionService
 
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('salesChannelId', $salesChannelId));
-        $criteria->addFilter(new EqualsAnyFilter('status', ['pending', 'processing', 'queued']));
+        $criteria->addFilter(new EqualsAnyFilter('status', JobStatus::IN_FLIGHT));
         $jobs = $this->jobRepository->searchIds($criteria, $context);
         if ($jobs->getTotal() > 0) {
             $updates = [];
             foreach ($jobs->getIds() as $id) {
-                $updates[] = ['id' => $id, 'status' => 'failed', 'writebackErrors' => [['code' => 'CONNECTION_DISCONNECTED', 'message' => 'Connection disconnected']]];
+                $updates[] = ['id' => $id, 'status' => JobStatus::FAILED, 'writebackErrors' => [['code' => ErrorCode::CONNECTION_DISCONNECTED->value, 'message' => ErrorCode::CONNECTION_DISCONNECTED->message()]]];
             }
             $this->jobRepository->update($updates, $context);
         }
@@ -118,7 +118,7 @@ class ConnectionService
     {
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('salesChannelId', $salesChannelId));
-        $criteria->addFilter(new EqualsAnyFilter('status', ['pending', 'processing', 'queued']));
+        $criteria->addFilter(new EqualsAnyFilter('status', JobStatus::IN_FLIGHT));
         return $this->jobRepository->searchIds($criteria, $context)->getTotal();
     }
 

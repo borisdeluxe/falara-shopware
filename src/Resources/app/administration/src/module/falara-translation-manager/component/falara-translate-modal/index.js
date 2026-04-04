@@ -307,15 +307,6 @@ Component.register('falara-translate-modal', {
             });
         },
 
-        toggleLanguage(langId) {
-            const idx = this.selectedLanguages.indexOf(langId);
-            if (idx > -1) {
-                this.selectedLanguages.splice(idx, 1);
-            } else {
-                this.selectedLanguages.push(langId);
-            }
-        },
-
         onTranslate() {
             if (this.selectedLanguages.length === 0) {
                 return;
