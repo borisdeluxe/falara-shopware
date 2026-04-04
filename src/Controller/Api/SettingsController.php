@@ -134,9 +134,12 @@ class SettingsController extends AbstractController
 
         return new JsonResponse([
             'usage' => [
-                'wordsUsed'      => $usage->wordsUsed,
-                'wordsLimit'     => $usage->wordsLimit,
-                'wordsRemaining' => $usage->wordsRemaining,
+                'wordsUsed'           => $usage->wordsUsed,
+                'wordsLimit'          => $usage->wordsLimit,
+                'wordsRemaining'      => $usage->wordsRemaining,
+                'plan'                => $usage->plan,
+                'bonusWordsAvailable' => $usage->bonusWordsAvailable,
+                'percentUsed'         => $usage->getPercentUsed(),
             ],
         ]);
     }
