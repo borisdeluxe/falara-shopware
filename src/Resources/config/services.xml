@@ -187,6 +187,7 @@
             <argument type="service" id="falara_translation_default.repository"/>
             <argument type="service" id="falara_custom_field_whitelist.repository"/>
             <argument type="service" id="Falara\TranslationManager\Service\ConnectionService"/>
+            <argument type="service" id="custom_field_set.repository"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>

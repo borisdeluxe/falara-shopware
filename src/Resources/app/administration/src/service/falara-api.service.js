@@ -160,6 +160,13 @@ class FalaraApiService {
             { headers: this.getHeaders() }
         );
     }
+
+    getAvailableCustomFields(salesChannelId) {
+        return this.httpClient.get(
+            `${this.basePath}/settings/available-custom-fields/${salesChannelId}`,
+            { headers: this.getHeaders() }
+        );
+    }
 }
 
 Application.addServiceProvider("falaraApiService", (container) => {

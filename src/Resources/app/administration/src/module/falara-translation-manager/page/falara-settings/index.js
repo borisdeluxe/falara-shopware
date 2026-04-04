@@ -104,45 +104,60 @@ Component.register('falara-settings', {
 
                     <!-- CUSTOM FIELDS TAB -->
                     <div v-show="activeTab === 'customFields'">
-                        <div :style="cardStyle">
+                        <div :style="{ ...cardStyle, maxWidth: '720px' }">
                             <h2 :style="cardTitleStyle">Custom Fields Whitelist</h2>
 
-                            <div :style="{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', padding: '16px', marginBottom: '20px', fontSize: '13px', lineHeight: '1.5', color: '#166534' }">
+                            <div :style="{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', padding: '16px', marginBottom: '24px', fontSize: '13px', lineHeight: '1.5', color: '#166534' }">
                                 <strong>What are Custom Fields?</strong><br>
                                 Custom Fields are additional translatable fields added to products by plugins or your own configuration (e.g. "Material", "Care Instructions", "USP Headline").
-                                Only fields added here will be included in translations. You can find the technical names under
-                                <strong>Settings &gt; System &gt; Custom Fields</strong> in your Shopware admin.
+                                Check the fields below to include them in translations. Only <strong>text</strong>, <strong>html</strong>, and <strong>textarea</strong> fields can be translated.
                             </div>
 
-                            <div :style="{ display: 'flex', gap: '12px', alignItems: 'flex-end', marginBottom: '16px' }">
-                                <div :style="{ flex: 1 }">
-                                    <label :style="{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '4px' }">Field Set Name</label>
-                                    <input v-model="newFieldSetName" placeholder="e.g. custom_product_details" :style="{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px' }" />
-                                </div>
-                                <div :style="{ flex: 1 }">
-                                    <label :style="{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '4px' }">Field Name</label>
-                                    <input v-model="newFieldName" placeholder="e.g. material_description" :style="{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px' }" />
-                                </div>
-                                <mt-button variant="primary" @click="addCustomField" :disabled="!newFieldSetName || !newFieldName" :style="{ flexShrink: 0 }">
-                                    Add
-                                </mt-button>
+                            <div v-if="isLoadingAvailableFields" :style="{ padding: '32px', textAlign: 'center', color: '#6b7280', fontSize: '14px' }">
+                                Loading custom fields…
                             </div>
 
-                            <p v-if="customFields.length === 0" :style="{ padding: '24px', textAlign: 'center', color: '#9ca3af', fontSize: '14px', background: '#f9fafb', borderRadius: '8px' }">No custom fields whitelisted yet. Fields will only be included in translations if added here.</p>
-                            <ul v-else :style="fieldListStyle">
-                                <li
-                                    v-for="(field, idx) in customFields"
-                                    :key="idx"
-                                    :style="fieldItemStyle"
+                            <div v-else-if="availableFieldSets.length === 0" :style="{ padding: '24px', textAlign: 'center', color: '#9ca3af', fontSize: '14px', background: '#f9fafb', borderRadius: '8px', marginBottom: '20px' }">
+                                No custom field sets found in your Shopware installation.
+                            </div>
+
+                            <div v-else>
+                                <div
+                                    v-for="set in availableFieldSets"
+                                    :key="set.name"
+                                    :style="{ marginBottom: '20px' }"
                                 >
-                                    <span>{{ field }}</span>
-                                    <mt-button variant="ghost" size="small" @click="removeCustomField(idx)">
-                                        Remove
-                                    </mt-button>
-                                </li>
-                            </ul>
+                                    <div :style="{ fontSize: '13px', fontWeight: '700', color: '#374151', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '6px 0', borderBottom: '1px solid #e5e7eb', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }">
+                                        {{ set.label }}
+                                        <span v-if="set.entity" :style="{ fontSize: '11px', fontWeight: '400', color: '#9ca3af', textTransform: 'none', letterSpacing: '0' }">{{ set.entity }}</span>
+                                    </div>
+                                    <div
+                                        v-for="field in set.fields"
+                                        :key="field.name"
+                                        :style="{ display: 'flex', alignItems: 'center', gap: '10px', padding: '7px 4px', borderRadius: '4px', opacity: field.translatable ? 1 : 0.45 }"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            :id="'cf-' + field.name"
+                                            :checked="isFieldWhitelisted(field.name)"
+                                            :disabled="!field.translatable"
+                                            @change="toggleField(field, set, $event)"
+                                            :style="{ width: '16px', height: '16px', cursor: field.translatable ? 'pointer' : 'not-allowed', flexShrink: 0 }"
+                                        />
+                                        <label
+                                            :for="'cf-' + field.name"
+                                            :style="{ fontSize: '14px', color: field.translatable ? '#1a1a2e' : '#9ca3af', cursor: field.translatable ? 'pointer' : 'default', flex: 1 }"
+                                        >
+                                            {{ field.label }}
+                                            <span :style="{ fontSize: '12px', color: '#9ca3af', marginLeft: '6px' }">{{ field.name }}</span>
+                                            <span v-if="!field.translatable" :style="{ fontSize: '12px', color: '#9ca3af', marginLeft: '6px', fontStyle: 'italic' }">— not translatable</span>
+                                        </label>
+                                        <span :style="{ fontSize: '11px', color: '#d1d5db', background: '#f3f4f6', borderRadius: '4px', padding: '1px 6px', flexShrink: 0 }">{{ field.type }}</span>
+                                    </div>
+                                </div>
+                            </div>
 
-                            <mt-button variant="primary" @click="saveCustomFields" :disabled="isSaving">
+                            <mt-button variant="primary" @click="saveCustomFields" :disabled="isSaving || isLoadingAvailableFields" :style="{ marginTop: '8px' }">
                                 {{ isSaving ? 'Saving…' : 'Save' }}
                             </mt-button>
                         </div>
@@ -244,8 +259,9 @@ Component.register('falara-settings', {
                 apiKey: '',
             },
             customFields: [],
-            newFieldName: '',
-            newFieldSetName: '',
+            availableFieldSets: [],
+            isLoadingAvailableFields: false,
+            whitelistedFields: [],
             defaults: {
                 sourceLanguage: '',
                 domain: '',
@@ -655,9 +671,29 @@ Component.register('falara-settings', {
             try {
                 const falaraApiService = Shopware.Service('falaraApiService');
                 const resp = await falaraApiService.getCustomFields(this.salesChannelId);
-                this.customFields = resp.data && resp.data.fields ? resp.data.fields : [];
+                const entries = resp.data && resp.data.customFields ? resp.data.customFields : [];
+                // Store whitelist entries with id for deletion
+                this.customFieldEntries = entries;
+                // Build flat set of whitelisted field names for checkbox state
+                this.whitelistedFields = entries.map(e => e.fieldName);
             } catch (e) {
-                this.customFields = [];
+                this.customFieldEntries = [];
+                this.whitelistedFields = [];
+            }
+            // Also load available fields from Shopware
+            await this.loadAvailableCustomFields();
+        },
+
+        async loadAvailableCustomFields() {
+            this.isLoadingAvailableFields = true;
+            try {
+                const falaraApiService = Shopware.Service('falaraApiService');
+                const resp = await falaraApiService.getAvailableCustomFields(this.salesChannelId);
+                this.availableFieldSets = resp.data && resp.data.sets ? resp.data.sets : [];
+            } catch (e) {
+                this.availableFieldSets = [];
+            } finally {
+                this.isLoadingAvailableFields = false;
             }
         },
 
@@ -703,25 +739,58 @@ Component.register('falara-settings', {
             }
         },
 
-        addCustomField() {
-            if (!this.newFieldSetName || !this.newFieldName) return;
-            const entry = this.newFieldSetName + '.' + this.newFieldName;
-            if (!this.customFields.includes(entry)) {
-                this.customFields.push(entry);
-            }
-            this.newFieldSetName = '';
-            this.newFieldName = '';
+        isFieldWhitelisted(fieldName) {
+            return this.whitelistedFields.includes(fieldName);
         },
 
-        removeCustomField(idx) {
-            this.customFields.splice(idx, 1);
+        toggleField(field, set, event) {
+            if (event.target.checked) {
+                if (!this.whitelistedFields.includes(field.name)) {
+                    this.whitelistedFields.push(field.name);
+                    this.pendingAdditions = this.pendingAdditions || [];
+                    this.pendingAdditions.push({ fieldSetName: set.name, fieldName: field.name });
+                }
+            } else {
+                const idx = this.whitelistedFields.indexOf(field.name);
+                if (idx !== -1) {
+                    this.whitelistedFields.splice(idx, 1);
+                    this.pendingRemovals = this.pendingRemovals || [];
+                    this.pendingRemovals.push(field.name);
+                }
+            }
         },
 
         async saveCustomFields() {
             this.isSaving = true;
             try {
                 const falaraApiService = Shopware.Service('falaraApiService');
-                await falaraApiService.saveCustomFields(this.salesChannelId, this.customFields);
+
+                // Determine current state by comparing whitelistedFields with stored entries
+                const storedFieldNames = (this.customFieldEntries || []).map(e => e.fieldName);
+
+                // Fields to add: in whitelistedFields but not in stored entries
+                const toAdd = this.whitelistedFields.filter(name => !storedFieldNames.includes(name));
+
+                // Fields to remove: in stored entries but not in whitelistedFields
+                const toRemove = (this.customFieldEntries || []).filter(e => !this.whitelistedFields.includes(e.fieldName));
+
+                // Find set name for each field to add
+                const addPromises = toAdd.map(fieldName => {
+                    let setName = '';
+                    for (const set of this.availableFieldSets) {
+                        const found = set.fields.find(f => f.name === fieldName);
+                        if (found) { setName = set.name; break; }
+                    }
+                    return falaraApiService.addCustomField(this.salesChannelId, setName, fieldName);
+                });
+
+                const removePromises = toRemove.map(entry => falaraApiService.deleteCustomField(entry.id));
+
+                await Promise.all([...addPromises, ...removePromises]);
+
+                // Reload to sync state
+                await this.loadCustomFields();
+
                 Shopware.State.dispatch('notification/createNotification', {
                     type: 'success',
                     message: 'Custom fields saved.',

@@ -20,6 +20,7 @@ class SettingsController extends AbstractController
         private readonly EntityRepository $translationDefaultRepository,
         private readonly EntityRepository $customFieldWhitelistRepository,
         private readonly ConnectionService $connectionService,
+        private readonly EntityRepository $customFieldSetRepository,
     ) {}
 
     // -------------------------------------------------------------------------
@@ -214,5 +215,65 @@ class SettingsController extends AbstractController
         $this->customFieldWhitelistRepository->delete([['id' => $id]], $context);
 
         return new JsonResponse(['success' => true]);
+    }
+
+    // -------------------------------------------------------------------------
+    // Available Custom Fields — from Shopware DAL
+    // -------------------------------------------------------------------------
+
+    #[Route(
+        path: '/api/_action/falara/settings/available-custom-fields/{salesChannelId}',
+        name: 'api.action.falara.settings.available_custom_fields',
+        methods: ['GET'],
+    )]
+    public function getAvailableCustomFields(string $salesChannelId, Context $context): JsonResponse
+    {
+        $translatableTypes = ['text', 'html', 'textarea'];
+
+        $criteria = new Criteria();
+        $criteria->addAssociation('customFields');
+        $criteria->addAssociation('relations');
+
+        $sets = $this->customFieldSetRepository->search($criteria, $context);
+
+        $result = [];
+        foreach ($sets as $set) {
+            $config = $set->getConfig() ?? [];
+            $label  = $config['label']['en-GB'] ?? $config['label']['de-DE'] ?? $set->getName();
+
+            // Determine entity from relations
+            $entity = null;
+            if ($set->getRelations() !== null) {
+                foreach ($set->getRelations() as $relation) {
+                    $entity = $relation->getEntityName();
+                    break;
+                }
+            }
+
+            $fields = [];
+            if ($set->getCustomFields() !== null) {
+                foreach ($set->getCustomFields() as $field) {
+                    $fieldConfig = $field->getConfig() ?? [];
+                    $fieldLabel  = $fieldConfig['label']['en-GB'] ?? $fieldConfig['label']['de-DE'] ?? $field->getName();
+                    $fieldType   = $field->getType();
+
+                    $fields[] = [
+                        'name'         => $field->getName(),
+                        'label'        => $fieldLabel,
+                        'type'         => $fieldType,
+                        'translatable' => in_array($fieldType, $translatableTypes, true),
+                    ];
+                }
+            }
+
+            $result[] = [
+                'name'   => $set->getName(),
+                'label'  => $label,
+                'entity' => $entity,
+                'fields' => $fields,
+            ];
+        }
+
+        return new JsonResponse(['sets' => $result]);
     }
 }
