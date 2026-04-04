@@ -4,11 +4,11 @@
     "falara-translation-manager": {
       "css": [],
       "dynamic": [
-        "/bundles/falaratranslationmanager/administration/assets/de-DE-8LB86EH0.js",
-        "/bundles/falaratranslationmanager/administration/assets/en-GB-Bb-9Rw99.js"
+        "/bundles/falaratranslationmanager/administration/assets/de-DE-iMwx0j41.js",
+        "/bundles/falaratranslationmanager/administration/assets/en-GB-uHKYb3pO.js"
       ],
       "js": [
-        "/bundles/falaratranslationmanager/administration/assets/falara-translation-manager-7WftcqY2.js"
+        "/bundles/falaratranslationmanager/administration/assets/falara-translation-manager-fuQm_cFB.js"
       ],
       "legacy": false,
       "preload": []

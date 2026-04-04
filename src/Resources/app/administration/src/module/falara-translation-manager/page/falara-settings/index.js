@@ -105,22 +105,30 @@ Component.register('falara-settings', {
                     <!-- CUSTOM FIELDS TAB -->
                     <div v-show="activeTab === 'customFields'">
                         <div :style="cardStyle">
-                            <h2 :style="cardTitleStyle">Custom Fields</h2>
-                            <p :style="descStyle">Define additional custom fields to include in translations.</p>
+                            <h2 :style="cardTitleStyle">Custom Fields Whitelist</h2>
 
-                            <div :style="fieldWrapStyle">
-                                <mt-text-field
-                                    label="Field Name"
-                                    v-model="newFieldName"
-                                />
+                            <div :style="{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', padding: '16px', marginBottom: '20px', fontSize: '13px', lineHeight: '1.5', color: '#166534' }">
+                                <strong>What are Custom Fields?</strong><br>
+                                Custom Fields are additional translatable fields added to products by plugins or your own configuration (e.g. "Material", "Care Instructions", "USP Headline").
+                                Only fields added here will be included in translations. You can find the technical names under
+                                <strong>Settings &gt; System &gt; Custom Fields</strong> in your Shopware admin.
                             </div>
-                            <div :style="{ marginBottom: '20px' }">
-                                <mt-button variant="primary" @click="addCustomField" :disabled="!newFieldName">
-                                    Add Field
+
+                            <div :style="{ display: 'flex', gap: '12px', alignItems: 'flex-end', marginBottom: '16px' }">
+                                <div :style="{ flex: 1 }">
+                                    <label :style="{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '4px' }">Field Set Name</label>
+                                    <input v-model="newFieldSetName" placeholder="e.g. custom_product_details" :style="{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px' }" />
+                                </div>
+                                <div :style="{ flex: 1 }">
+                                    <label :style="{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '4px' }">Field Name</label>
+                                    <input v-model="newFieldName" placeholder="e.g. material_description" :style="{ width: '100%', padding: '8px 12px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px' }" />
+                                </div>
+                                <mt-button variant="primary" @click="addCustomField" :disabled="!newFieldSetName || !newFieldName" :style="{ flexShrink: 0 }">
+                                    Add
                                 </mt-button>
                             </div>
 
-                            <p v-if="customFields.length === 0" :style="emptyTextStyle">No custom fields added yet.</p>
+                            <p v-if="customFields.length === 0" :style="{ padding: '24px', textAlign: 'center', color: '#9ca3af', fontSize: '14px', background: '#f9fafb', borderRadius: '8px' }">No custom fields whitelisted yet. Fields will only be included in translations if added here.</p>
                             <ul v-else :style="fieldListStyle">
                                 <li
                                     v-for="(field, idx) in customFields"
@@ -228,6 +236,7 @@ Component.register('falara-settings', {
             },
             customFields: [],
             newFieldName: '',
+            newFieldSetName: '',
             defaults: {
                 sourceLanguage: '',
                 domain: '',
@@ -686,10 +695,12 @@ Component.register('falara-settings', {
         },
 
         addCustomField() {
-            if (!this.newFieldName) return;
-            if (!this.customFields.includes(this.newFieldName)) {
-                this.customFields.push(this.newFieldName);
+            if (!this.newFieldSetName || !this.newFieldName) return;
+            const entry = this.newFieldSetName + '.' + this.newFieldName;
+            if (!this.customFields.includes(entry)) {
+                this.customFields.push(entry);
             }
+            this.newFieldSetName = '';
             this.newFieldName = '';
         },
 

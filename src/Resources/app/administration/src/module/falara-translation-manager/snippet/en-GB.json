@@ -155,7 +155,13 @@
                 "fieldName": "Field Name",
                 "addField": "Add Field",
                 "removeField": "Remove",
-                "noFields": "No custom fields configured"
+                "noFields": "No custom fields configured",
+                "customFieldsDescription": "Custom Fields are additional translatable fields added to products by plugins or your own configuration (e.g. 'Material', 'Care Instructions', 'USP Headline'). Add the technical field set name and field name to include them in translations. You can find these names under Settings > System > Custom Fields in your Shopware admin.",
+                "customFieldsEmpty": "No custom fields whitelisted yet. Custom fields will only be included in translations if explicitly added here.",
+                "fieldSetNameLabel": "Field Set Name",
+                "fieldSetNamePlaceholder": "e.g. custom_product_details",
+                "fieldNameLabel": "Field Name",
+                "fieldNamePlaceholder": "e.g. material_description"
             },
             "defaults": {
                 "title": "Translation Defaults",

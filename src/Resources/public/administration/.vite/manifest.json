@@ -1,6 +1,6 @@
 {
   "main.js": {
-    "file": "assets/falara-translation-manager-7WftcqY2.js",
+    "file": "assets/falara-translation-manager-fuQm_cFB.js",
     "name": "falara-translation-manager",
     "src": "main.js",
     "isEntry": true,
@@ -10,13 +10,13 @@
     ]
   },
   "module/falara-translation-manager/snippet/de-DE.json": {
-    "file": "assets/de-DE-8LB86EH0.js",
+    "file": "assets/de-DE-iMwx0j41.js",
     "name": "de-DE",
     "src": "module/falara-translation-manager/snippet/de-DE.json",
     "isDynamicEntry": true
   },
   "module/falara-translation-manager/snippet/en-GB.json": {
-    "file": "assets/en-GB-Bb-9Rw99.js",
+    "file": "assets/en-GB-uHKYb3pO.js",
     "name": "en-GB",
     "src": "module/falara-translation-manager/snippet/en-GB.json",
     "isDynamicEntry": true

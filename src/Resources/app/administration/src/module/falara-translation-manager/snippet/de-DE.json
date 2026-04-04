@@ -155,7 +155,13 @@
                 "fieldName": "Feldname",
                 "addField": "Feld hinzufügen",
                 "removeField": "Entfernen",
-                "noFields": "Keine benutzerdefinierten Felder konfiguriert"
+                "noFields": "Keine benutzerdefinierten Felder konfiguriert",
+                "customFieldsDescription": "Zusatzfelder sind zusätzliche übersetzbare Felder, die von Plugins oder Ihrer eigenen Konfiguration an Produkte angehängt werden (z.B. 'Material', 'Pflegehinweise', 'USP Headline'). Geben Sie den technischen Feldset-Namen und Feldnamen ein, um sie in Übersetzungen einzubeziehen. Die Namen finden Sie unter Einstellungen > System > Zusatzfelder.",
+                "customFieldsEmpty": "Noch keine Zusatzfelder freigegeben. Zusatzfelder werden nur übersetzt, wenn sie hier explizit hinzugefügt werden.",
+                "fieldSetNameLabel": "Feldset-Name",
+                "fieldSetNamePlaceholder": "z.B. custom_product_details",
+                "fieldNameLabel": "Feldname",
+                "fieldNamePlaceholder": "z.B. material_description"
             },
             "defaults": {
                 "title": "Übersetzungsstandards",
