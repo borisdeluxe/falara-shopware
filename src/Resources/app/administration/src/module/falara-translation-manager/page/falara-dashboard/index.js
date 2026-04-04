@@ -223,7 +223,7 @@ Component.register('falara-dashboard', {
                 if (this.isConnected) {
                     try {
                         const usageResp = await falaraApiService.getUsage(this.salesChannelId);
-                        this.usage = usageResp.data || {};
+                        this.usage = usageResp.data?.usage || usageResp.data || {};
                     } catch (e) {
                         this.usage = {};
                     }
