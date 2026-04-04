@@ -157,6 +157,7 @@ Component.register('falara-settings', {
                                 </div>
                             </div>
 
+                            <div v-if="saveMessage" :style="{ padding: '10px 16px', borderRadius: '6px', marginBottom: '12px', fontSize: '14px', background: saveMessage.type === 'success' ? '#f0fdf4' : '#fef2f2', color: saveMessage.type === 'success' ? '#166534' : '#991b1b', border: saveMessage.type === 'success' ? '1px solid #bbf7d0' : '1px solid #fecaca' }">{{ saveMessage.text }}</div>
                             <mt-button variant="primary" @click="saveCustomFields" :disabled="isSaving || isLoadingAvailableFields" :style="{ marginTop: '8px' }">
                                 {{ isSaving ? 'Saving…' : 'Save' }}
                             </mt-button>
@@ -249,6 +250,7 @@ Component.register('falara-settings', {
         return {
             isLoading: true,
             isSaving: false,
+            saveMessage: null,
             isConnecting: false,
             isDisconnecting: false,
             activeTab: 'connection',
@@ -790,11 +792,8 @@ Component.register('falara-settings', {
 
                 // Reload to sync state
                 await this.loadCustomFields();
-
-                Shopware.State.dispatch('notification/createNotification', {
-                    type: 'success',
-                    message: 'Custom fields saved.',
-                });
+                this.saveMessage = { type: 'success', text: 'Custom fields saved successfully.' };
+                setTimeout(() => { this.saveMessage = null; }, 4000);
             } catch (e) {
                 Shopware.State.dispatch('notification/createNotification', {
                     type: 'error',

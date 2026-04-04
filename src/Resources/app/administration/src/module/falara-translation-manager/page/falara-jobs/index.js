@@ -145,7 +145,7 @@ Component.register('falara-jobs', {
         },
 
         viewJob(jobId) {
-            this..push({ name: 'falara.translation.manager.job.detail', params: { id: jobId } });
+            this.$router.push({ name: 'falara.translation.manager.job.detail', params: { id: jobId } });
         },
 
         async archiveJob(jobId) {
