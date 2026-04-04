@@ -9,6 +9,7 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\NotFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\Filter;
 
@@ -78,13 +79,13 @@ class ProductContentType extends AbstractContentType
 
     public function getAvailableItems(string $languageId, Context $context, int $limit = 50, int $offset = 0): array
     {
-        $langContext = $this->createContextWithLanguage($languageId, $context);
-
         $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('parentId', null));
         $criteria->setLimit($limit);
         $criteria->setOffset($offset);
+        $criteria->addSorting(new FieldSorting('name', FieldSorting::ASCENDING));
 
-        $products = $this->repository->search($criteria, $langContext);
+        $products = $this->repository->search($criteria, $context);
 
         $items = [];
         foreach ($products as $product) {
