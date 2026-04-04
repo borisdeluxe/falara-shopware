@@ -122,7 +122,12 @@
             "coverage": "Coverage",
             "recommendation": "Recommendation",
             "noResults": "No audit results yet. Run a scan to get started.",
-            "planRecommendation": "Based on your audit, we recommend the {plan} plan"
+            "planRecommendation": "Based on your audit, we recommend the {plan} plan",
+            "totalWords": "Total Words",
+            "totalItems": "Total Items",
+            "contentType": "Content Type",
+            "items": "Items",
+            "words": "Words"
         },
         "settings": {
             "title": "Settings",

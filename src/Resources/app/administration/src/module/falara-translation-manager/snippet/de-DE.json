@@ -122,7 +122,12 @@
             "coverage": "Abdeckung",
             "recommendation": "Empfehlung",
             "noResults": "Noch keine Audit-Ergebnisse. Starten Sie einen Scan.",
-            "planRecommendation": "Basierend auf Ihrem Audit empfehlen wir den {plan}-Plan"
+            "planRecommendation": "Basierend auf Ihrem Audit empfehlen wir den {plan}-Plan",
+            "totalWords": "Wörter gesamt",
+            "totalItems": "Einträge gesamt",
+            "contentType": "Inhaltstyp",
+            "items": "Einträge",
+            "words": "Wörter"
         },
         "settings": {
             "title": "Einstellungen",
