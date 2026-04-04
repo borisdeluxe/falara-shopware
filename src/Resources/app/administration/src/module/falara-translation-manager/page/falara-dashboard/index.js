@@ -259,7 +259,7 @@ Component.register('falara-dashboard', {
         },
 
         goToJob(jobId) {
-            this.$router.push({ name: 'falara.translation.manager.job.detail', params: { id: jobId } });
+            this.$router.push({ name: 'falara.translation.manager.job-detail', params: { id: jobId } });
         },
     },
 });
