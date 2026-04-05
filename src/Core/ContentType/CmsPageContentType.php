@@ -46,11 +46,10 @@ class CmsPageContentType extends AbstractContentType
         $criteria->addAssociation('sections.blocks.slots');
         $pages = $this->repository->search($criteria, $langContext);
 
-        $result = [];
-        foreach ($pages as $page) {
-            $texts    = [];
-            $warnings = [];
+        $texts    = [];
+        $warnings = [];
 
+        foreach ($pages as $page) {
             foreach ($page->getSections() ?? [] as $section) {
                 foreach ($section->getBlocks() ?? [] as $block) {
                     foreach ($block->getSlots() ?? [] as $slot) {
@@ -78,14 +77,14 @@ class CmsPageContentType extends AbstractContentType
 
                             $slotHasKnownKey = true;
                             $texts[] = [
-                                'entity_id'   => $page->getId(),
-                                'entity_type' => $this->getType(),
-                                'field'       => sprintf('slot.%s.%s', $slot->getId(), $key),
-                                'text'        => (string) $value,
-                                'metadata'    => [
-                                    'slot_id'    => $slot->getId(),
-                                    'slot_type'  => $slot->getType(),
-                                    'config_key' => $key,
+                                'text'     => (string) $value,
+                                'metadata' => [
+                                    'entity_id'   => $page->getId(),
+                                    'entity_type' => $this->getType(),
+                                    'field'       => sprintf('slot.%s.%s', $slot->getId(), $key),
+                                    'slot_id'     => $slot->getId(),
+                                    'slot_type'   => $slot->getType(),
+                                    'config_key'  => $key,
                                 ],
                             ];
                         }
@@ -115,19 +114,9 @@ class CmsPageContentType extends AbstractContentType
                 }
             }
 
-            $result[] = [
-                'entity_id'   => $page->getId(),
-                'entity_type' => $this->getType(),
-                'texts'       => $texts,
-                'metadata'    => [
-                    'name' => $page->getName(),
-                    'type' => $page->getType(),
-                ],
-                'warnings'    => $warnings,
-            ];
         }
 
-        return $result;
+        return ['texts' => $texts, 'warnings' => $warnings];
     }
 
     /**

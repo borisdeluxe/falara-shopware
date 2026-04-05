@@ -98,6 +98,13 @@ class TranslateController extends AbstractController
         try {
             $apiClient = $this->connectionService->getApiClient($salesChannelId, $context);
             $batch     = $apiClient->createTranslationJob($texts, $sourceLang, $targetLocales, $options);
+        } catch (\Falara\TranslationManager\Exception\FalaraApiException $e) {
+            return new JsonResponse([
+                'error' => 'Falara API error: ' . ($e->getDetail() ?? $e->getMessage()),
+                'statusCode' => $e->getStatusCode(),
+                'detail' => $e->getDetail(),
+                'debug' => ['sourceLang' => $sourceLang, 'targetLocales' => $targetLocales, 'textsCount' => count($texts), 'firstText' => $texts[0] ?? null],
+            ], 502);
         } catch (\Throwable $e) {
             return new JsonResponse(['error' => 'Falara API submission failed: ' . $e->getMessage()], 502);
         }

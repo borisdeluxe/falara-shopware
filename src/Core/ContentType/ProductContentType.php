@@ -52,7 +52,7 @@ class ProductContentType extends AbstractContentType
         $criteria = new Criteria($entityIds);
         $products  = $this->repository->search($criteria, $langContext);
 
-        $result = [];
+        $texts = [];
         foreach ($products as $product) {
             $entity = [
                 'name'            => $product->getName(),
@@ -62,19 +62,13 @@ class ProductContentType extends AbstractContentType
                 'keywords'        => $product->getKeywords(),
             ];
 
-            $texts = $this->buildTexts($entity, $product->getId(), $this->getType(), self::FIELDS);
-
-            $result[] = [
-                'entity_id'   => $product->getId(),
-                'entity_type' => $this->getType(),
-                'texts'       => $texts,
-                'metadata'    => [
-                    'productNumber' => $product->getProductNumber(),
-                ],
-            ];
+            $texts = array_merge(
+                $texts,
+                $this->buildTexts($entity, $product->getId(), $this->getType(), self::FIELDS)
+            );
         }
 
-        return $result;
+        return ['texts' => $texts, 'warnings' => []];
     }
 
     public function getAvailableItems(string $languageId, Context $context, int $limit = 50, int $offset = 0): array

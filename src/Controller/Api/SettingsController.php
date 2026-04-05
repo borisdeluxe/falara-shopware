@@ -189,8 +189,19 @@ class SettingsController extends AbstractController
             return new JsonResponse(['error' => 'fieldSetName and fieldName are required.'], 400);
         }
 
-        $id = Uuid::randomHex();
+        // Idempotent: skip if already whitelisted
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('salesChannelId', $salesChannelId));
+        $criteria->addFilter(new EqualsFilter('fieldSetName', $fieldSetName));
+        $criteria->addFilter(new EqualsFilter('fieldName', $fieldName));
+        $criteria->setLimit(1);
 
+        $existing = $this->customFieldWhitelistRepository->search($criteria, $context)->first();
+        if ($existing !== null) {
+            return new JsonResponse(['id' => $existing->getId(), 'success' => true, 'existed' => true]);
+        }
+
+        $id = Uuid::randomHex();
         $this->customFieldWhitelistRepository->create([[
             'id'             => $id,
             'salesChannelId' => $salesChannelId,

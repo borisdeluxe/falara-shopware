@@ -47,7 +47,7 @@ class CategoryContentType extends AbstractContentType
         $criteria   = new Criteria($entityIds);
         $categories = $this->repository->search($criteria, $langContext);
 
-        $result = [];
+        $texts = [];
         foreach ($categories as $category) {
             $entity = [
                 'name'            => $category->getName(),
@@ -57,20 +57,13 @@ class CategoryContentType extends AbstractContentType
                 'keywords'        => $category->getKeywords(),
             ];
 
-            $texts = $this->buildTexts($entity, $category->getId(), $this->getType(), self::FIELDS);
-
-            $result[] = [
-                'entity_id'   => $category->getId(),
-                'entity_type' => $this->getType(),
-                'texts'       => $texts,
-                'metadata'    => [
-                    'path' => $category->getPath(),
-                    'type' => $category->getType(),
-                ],
-            ];
+            $texts = array_merge(
+                $texts,
+                $this->buildTexts($entity, $category->getId(), $this->getType(), self::FIELDS)
+            );
         }
 
-        return $result;
+        return ['texts' => $texts, 'warnings' => []];
     }
 
     public function getAvailableItems(string $languageId, Context $context, int $limit = 50, int $offset = 0): array
