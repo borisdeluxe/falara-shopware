@@ -41,6 +41,15 @@ class TranslateController extends AbstractController
         $options        = $data['options'] ?? [];
         $projectName    = $data['projectName'] ?? null;
 
+        // Auto-generate project name if not provided
+        if ($projectName === null) {
+            $typeLabels = ['product' => 'Products', 'category' => 'Categories', 'cms_page' => 'CMS Pages', 'snippet' => 'Snippets'];
+            $label = $typeLabels[$resourceType] ?? ucfirst($resourceType);
+            $count = count($entityIds);
+            $langs = implode(', ', array_map('strtoupper', $targetLocales));
+            $projectName = sprintf('%s (%d) → %s', $label, $count, $langs);
+        }
+
         if ($salesChannelId === '' || $resourceType === '' || empty($entityIds) || $sourceLocale === '' || empty($targetLocales)) {
             return new JsonResponse(
                 ['error' => 'salesChannelId, resourceType, entityIds, sourceLocale and targetLocales are required.'],
