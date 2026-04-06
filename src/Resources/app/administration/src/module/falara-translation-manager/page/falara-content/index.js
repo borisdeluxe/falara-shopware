@@ -148,19 +148,18 @@ Component.register('falara-content', {
                         </mt-card>
                     </div>
                 </div>
-            </div>
 
-                <!-- Success Modal -->
-                <div v-if="showSuccessModal" :style="{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }">
-                    <div :style="{ background: '#fff', borderRadius: '16px', padding: '40px 48px', textAlign: 'center', maxWidth: '420px', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }">
-                        <div :style="{ width: '64px', height: '64px', borderRadius: '50%', background: '#22c55e', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }">
-                            <span :style="{ color: '#fff', fontSize: '32px', lineHeight: 1 }">&#x2714;</span>
-                        </div>
-                        <h2 :style="{ fontSize: '20px', fontWeight: '700', color: '#111827', margin: '0 0 8px' }">Translation Started</h2>
-                        <p :style="{ fontSize: '14px', color: '#6b7280', margin: '0 0 24px', lineHeight: '1.5' }">Your content has been sent to Falara for translation. You can track the progress on the Jobs page.</p>
-                        <button @click="goToJobs" :style="{ background: '#1a73e8', color: '#fff', border: 'none', borderRadius: '8px', padding: '12px 32px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }">View Jobs</button>
+            <!-- Success Modal (fixed position, outside content flow) -->
+            <div v-if="showSuccessModal" :style="{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }">
+                <div :style="{ background: '#fff', borderRadius: '16px', padding: '40px 48px', textAlign: 'center', maxWidth: '420px', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }">
+                    <div :style="{ width: '64px', height: '64px', borderRadius: '50%', background: '#22c55e', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }">
+                        <span :style="{ color: '#fff', fontSize: '32px', lineHeight: 1 }">&#x2714;</span>
                     </div>
+                    <h2 :style="{ fontSize: '20px', fontWeight: '700', color: '#111827', margin: '0 0 8px' }">Translation Started</h2>
+                    <p :style="{ fontSize: '14px', color: '#6b7280', margin: '0 0 24px', lineHeight: '1.5' }">Your content has been sent to Falara for translation. You can track the progress on the Jobs page.</p>
+                    <button @click="goToJobs" :style="{ background: '#1a73e8', color: '#fff', border: 'none', borderRadius: '8px', padding: '12px 32px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }">View Jobs</button>
                 </div>
+            </div>
             </div>
         </div>
     `,
