@@ -44,12 +44,25 @@ Component.register('falara-translate-modal', {
                 <div v-if="showAdvanced" :style="advancedContentStyle">
                     <div :style="fieldGroupStyle">
                         <label :style="labelStyle">{{ $t('falara-translation-manager.modal.domain') }}</label>
-                        <mt-text-field v-model="form.domain" />
+                        <select v-model="form.domain" :style="selectStyle">
+                            <option value="">None</option>
+                            <option value="e-commerce">E-Commerce</option>
+                            <option value="marketing">Marketing</option>
+                            <option value="legal">Legal</option>
+                            <option value="medical">Medical</option>
+                            <option value="technical">Technical</option>
+                            <option value="software">Software</option>
+                        </select>
                     </div>
 
                     <div :style="fieldGroupStyle">
                         <label :style="labelStyle">{{ $t('falara-translation-manager.modal.tone') }}</label>
-                        <mt-text-field v-model="form.tone" />
+                        <select v-model="form.tone" :style="selectStyle">
+                            <option value="">None</option>
+                            <option value="formal">Formal</option>
+                            <option value="casual">Casual</option>
+                            <option value="technical">Technical</option>
+                        </select>
                     </div>
 
                     <div :style="fieldGroupStyle">
