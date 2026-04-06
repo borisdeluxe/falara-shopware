@@ -86,7 +86,21 @@ class TranslateController extends AbstractController
 
         // Determine source language ID for DAL export and BCP-47 code for API
         $sourceLanguageId = $sourceLocale;
-        $sourceLang = $data['sourceLang'] ?? 'en';
+
+        // Resolve BCP-47 code from Shopware language ID
+        $sourceLang = $data['sourceLang'] ?? null;
+        if ($sourceLang === null || $sourceLang === 'en') {
+            // Auto-detect from language ID
+            $langCriteria = new Criteria([$sourceLanguageId]);
+            $langCriteria->addAssociation('locale');
+            $langEntity = $this->languageRepository->search($langCriteria, $context)->first();
+            if ($langEntity && $langEntity->getLocale()) {
+                $code = $langEntity->getLocale()->getCode(); // e.g. "de-DE"
+                $sourceLang = strtolower(substr($code, 0, 2)); // "de"
+            } else {
+                $sourceLang = 'en'; // fallback
+            }
+        }
 
         // Export content using Shopware language ID
         try {

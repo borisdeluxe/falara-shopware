@@ -43,6 +43,7 @@
         <service id="Falara\TranslationManager\Service\ConnectionService">
             <argument type="service" id="falara_connection.repository"/>
             <argument type="service" id="falara_job.repository"/>
+            <argument type="service" id="language.repository"/>
             <argument type="service" id="Falara\TranslationManager\Service\EncryptionService"/>
             <argument>%falara.api_url%</argument>
         </service>
@@ -51,11 +52,13 @@
             <argument type="service" id="Doctrine\DBAL\Connection"/>
             <argument type="service" id="Falara\TranslationManager\Core\ContentType\ContentTypeRegistry"/>
             <argument type="service" id="falara_job.repository"/>
+            <argument type="service" id="language.repository"/>
             <argument type="service" id="logger"/>
         </service>
 
         <service id="Falara\TranslationManager\Service\JobPollingService">
             <argument type="service" id="falara_job.repository"/>
+            <argument type="service" id="language.repository"/>
             <argument type="service" id="Falara\TranslationManager\Service\ConnectionService"/>
             <argument type="service" id="messenger.bus.default"/>
             <argument type="service" id="Doctrine\DBAL\Connection"/>
@@ -111,6 +114,7 @@
             <argument type="service" id="Falara\TranslationManager\Service\TranslationWriter"/>
             <argument type="service" id="Falara\TranslationManager\Service\ConnectionService"/>
             <argument type="service" id="falara_job.repository"/>
+            <argument type="service" id="language.repository"/>
             <argument type="service" id="logger"/>
             <tag name="messenger.message_handler"/>
         </service>
@@ -162,6 +166,7 @@
             <argument type="service" id="Falara\TranslationManager\Service\ConnectionService"/>
             <argument type="service" id="Falara\TranslationManager\Core\ContentType\ContentTypeRegistry"/>
             <argument type="service" id="falara_job.repository"/>
+            <argument type="service" id="language.repository"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
@@ -169,6 +174,7 @@
 
         <service id="Falara\TranslationManager\Controller\Api\JobController" public="true">
             <argument type="service" id="falara_job.repository"/>
+            <argument type="service" id="language.repository"/>
             <argument type="service" id="messenger.bus.default"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
@@ -179,6 +185,7 @@
             <argument type="service" id="Falara\TranslationManager\Core\ContentType\ContentTypeRegistry"/>
             <argument type="service" id="Falara\TranslationManager\Service\ConnectionService"/>
             <argument type="service" id="falara_job.repository"/>
+            <argument type="service" id="language.repository"/>
             <call method="setContainer">
                 <argument type="service" id="service_container"/>
             </call>
@@ -196,6 +203,7 @@
 
         <service id="Falara\TranslationManager\Controller\Webhook\WebhookController" public="true">
             <argument type="service" id="falara_job.repository"/>
+            <argument type="service" id="language.repository"/>
             <argument type="service" id="Falara\TranslationManager\Service\ConnectionService"/>
             <argument type="service" id="messenger.bus.default"/>
             <argument type="service" id="logger"/>
