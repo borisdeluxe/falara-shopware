@@ -96,6 +96,7 @@
         <service id="Falara\TranslationManager\Core\ContentType\SnippetContentType">
             <argument type="service" id="snippet.repository"/>
             <argument type="service" id="snippet_set.repository"/>
+            <argument type="service" id="language.repository"/>
             <argument type="service" id="Shopware\Core\System\Snippet\Files\SnippetFileCollectionFactory"/>
             <argument type="service" id="Falara\TranslationManager\Service\WordCounter"/>
             <argument type="service" id="logger"/>
