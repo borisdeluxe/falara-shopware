@@ -84,9 +84,9 @@ Component.register('falara-dashboard', {
                                     @mouseenter="$event.currentTarget.style.background = '#f0f4ff'; $event.currentTarget.style.cursor = 'pointer'"
                                     @mouseleave="$event.currentTarget.style.background = idx % 2 === 0 ? '#ffffff' : '#f9fafb'; $event.currentTarget.style.cursor = 'default'"
                                 >
-                                    <td :style="tdStyle">{{ job.contentType }}</td>
+                                    <td :style="tdStyle">{{ job.resourceType }}</td>
                                     <td :style="tdStyle"><falara-status-badge :status="job.status" /></td>
-                                    <td :style="tdStyle">{{ job.targetLanguage }}</td>
+                                    <td :style="tdStyle">{{ job.targetLocale }}</td>
                                     <td :style="tdStyle">{{ formatDate(job.createdAt) }}</td>
                                 </tr>
                             </tbody>
