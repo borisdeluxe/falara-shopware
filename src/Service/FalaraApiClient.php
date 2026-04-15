@@ -161,7 +161,8 @@ class FalaraApiClient
     {
         $options = [
             'headers' => [
-                'X-API-Key' => $this->apiKey,
+                'X-API-Key'          => $this->apiKey,
+                'X-Falara-Connector' => 'shopware',
                 'Accept'    => 'application/json',
             ],
         ];
